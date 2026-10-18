@@ -78,6 +78,26 @@ def test_baseline_next_to_central_profiles_is_not_a_profile(tmp_path):
     assert s["profile"]["file"] == "ecu.yaml" and s["baseline"]["file"] == "ecu.baseline.yaml"
 
 
+def test_git_calls_ignore_repository_hooks_and_monitors(tmp_path, monkeypatch):
+    """A repository's config may name a command (core.fsmonitor); archrev must never let git run it."""
+    import archrev.pipeline as pipeline
+    import archrev.profile as profile
+    seen = []
+
+    def fake_run(cmd, **kwargs):
+        seen.append(cmd)
+        class R:
+            stdout = ""
+        return R()
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    pipeline._git(tmp_path, "status", "--porcelain")
+    profile._git_remotes(tmp_path)
+    for cmd in seen:
+        assert cmd[:2] == ["git", "-C"]
+        assert "core.fsmonitor=false" in cmd and "core.hooksPath=/dev/null" in cmd
+        assert cmd.index("core.fsmonitor=false") < cmd.index(cmd[-1])
+
+
 def test_no_match_uses_defaults_and_says_so(tmp_path):
     repo = _repo(tmp_path)
     central = _central(tmp_path, {"other.yaml": 'name: "other"\nmatch: {repo_names: ["nope"]}\n'})

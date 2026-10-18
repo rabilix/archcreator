@@ -41,8 +41,9 @@ MODULES_SCHEMA = "archrev.modules/1"
 
 
 def _git(repo: Path, *args: str) -> str | None:
+    from .profile import git_command
     try:
-        out = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, check=True)
+        out = subprocess.run(git_command(repo, *args), capture_output=True, text=True, check=True)
         return out.stdout
     except (OSError, subprocess.CalledProcessError):
         return None

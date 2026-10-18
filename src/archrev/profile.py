@@ -340,9 +340,16 @@ def default_profile_dirs() -> list[Path]:
     return dirs
 
 
+def git_command(repo: Path, *args: str) -> list[str]:
+    """A git command line that lets the analyzed repository run nothing: its config may name a file-system
+    monitor command (core.fsmonitor) or hooks, and archrev only reads remotes, HEAD and the dirty state."""
+    return ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
+            "-c", "core.hooksPath=/dev/null", *args]
+
+
 def _git_remotes(repo: Path) -> list[str]:
     try:
-        out = subprocess.run(["git", "-C", str(repo), "remote", "-v"], capture_output=True, text=True, check=True)
+        out = subprocess.run(git_command(repo, "remote", "-v"), capture_output=True, text=True, check=True)
     except (OSError, subprocess.CalledProcessError):
         return []
     return sorted({normalize_remote(line.split()[1]) for line in out.stdout.splitlines() if len(line.split()) >= 2})
