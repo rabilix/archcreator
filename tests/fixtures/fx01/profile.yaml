@@ -1,0 +1,18 @@
+profile_version: 1
+name: fx01
+scope: src/App
+compile:
+  working_dir: src
+  include_dirs: [App, lib]
+  defines: []
+  args: ["-std=c11"]
+build_list:
+  makefile: src/build.mk
+  variables: [SRC_APP]
+  base_dir: src
+modules:
+  prefix_aliases: {}
+rules:
+  complexity: {ccn_max: 5, nesting_max: 3, nloc_max: 150, params_max: 6}
+gate:
+  min_parse_coverage: 1.0

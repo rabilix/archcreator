@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UML vs Code Modules</title>
+<style>
+:root {
+  --bg:#f7f7f5; --panel:#ffffff; --text:#1d2125; --muted:#5f6670; --line:#dcdfe3; --accent:#1f5fa8;
+  --uml:#6b3fa0; --code:#1f7a4d;
+  --ok-bg:#e3f4ea; --ok-fg:#14633a; --warn-bg:#fdf1d8; --warn-fg:#7a5200; --bad-bg:#fbe3e1; --bad-fg:#9b1c12;
+  --info-bg:#e5eef9; --info-fg:#1f4f86; --asil-bg:#2b2f36; --asil-fg:#ffd75e; --codebg:#eef0f2;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#15171a; --panel:#1e2125; --text:#e4e6e9; --muted:#9aa1ab; --line:#33373d; --accent:#79aef0;
+  --uml:#b69be0; --code:#6fcf9b;
+  --ok-bg:#173826; --ok-fg:#8fe0b0; --warn-bg:#3b2e10; --warn-fg:#f2c86b; --bad-bg:#43201d; --bad-fg:#f5a39b;
+  --info-bg:#1b2c42; --info-fg:#9cc4f2; --asil-bg:#ffd75e; --asil-fg:#2b2f36; --codebg:#2a2e33;
+} }
+:root[data-theme="dark"] {
+  --bg:#15171a; --panel:#1e2125; --text:#e4e6e9; --muted:#9aa1ab; --line:#33373d; --accent:#79aef0;
+  --uml:#b69be0; --code:#6fcf9b;
+  --ok-bg:#173826; --ok-fg:#8fe0b0; --warn-bg:#3b2e10; --warn-fg:#f2c86b; --bad-bg:#43201d; --bad-fg:#f5a39b;
+  --info-bg:#1b2c42; --info-fg:#9cc4f2; --asil-bg:#ffd75e; --asil-fg:#2b2f36; --codebg:#2a2e33;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+main { max-width:1100px; margin:0 auto; padding:24px 16px 64px; }
+h1 { font-size:1.7rem; margin:0 0 4px; }
+h2 { font-size:1.3rem; margin:0; }
+h3 { font-size:1rem; margin:22px 0 8px; }
+a { color:var(--accent); }
+code { font:0.86em/1.4 ui-monospace,Consolas,monospace; background:var(--codebg); padding:1px 4px; border-radius:4px; overflow-wrap:anywhere; }
+.muted { color:var(--muted); font-weight:normal; }
+.lede { color:var(--muted); margin:0 0 20px; }
+.panel, .module { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; margin:18px 0; }
+.twocol { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:760px) { .twocol { grid-template-columns:1fr; } }
+.side { border:1px solid var(--line); border-radius:8px; padding:12px 14px; border-top:4px solid var(--line); min-width:0; }
+.side.uml { border-top-color:var(--uml); } .side.code { border-top-color:var(--code); }
+.side h3 { margin-top:0; }
+.side.uml h3 { color:var(--uml); } .side.code h3 { color:var(--code); }
+.side ul { margin:0; padding-left:18px; }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:4px 12px; margin:0; }
+dt { color:var(--muted); } dd { margin:0; min-width:0; }
+@media (max-width:480px) { dl { grid-template-columns:1fr; } dt { margin-top:6px; } }
+.tablewrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:0.92rem; }
+th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+thead th { color:var(--muted); font-weight:600; white-space:nowrap; }
+td.num { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.chip { display:inline-block; padding:1px 8px; margin:2px 3px 2px 0; border-radius:999px; font-size:0.8rem; white-space:nowrap; }
+.chip.ok { background:var(--ok-bg); color:var(--ok-fg); } .chip.warn { background:var(--warn-bg); color:var(--warn-fg); }
+.chip.bad { background:var(--bad-bg); color:var(--bad-fg); } .chip.asil { background:var(--asil-bg); color:var(--asil-fg); font-weight:600; }
+.mhead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.role { margin:6px 0 14px; }
+ul.notes { list-style:none; padding:0; margin:0; }
+ul.notes li { padding:6px 10px; margin:4px 0; border-left:4px solid; border-radius:4px; }
+.n-ok { border-color:var(--ok-fg); background:var(--ok-bg); } .n-warn { border-color:var(--warn-fg); background:var(--warn-bg); }
+.n-bad { border-color:var(--bad-fg); background:var(--bad-bg); } .n-info { border-color:var(--info-fg); background:var(--info-bg); }
+ul.deps { padding-left:18px; margin:0; } ul.deps li { margin:3px 0; }
+details { margin-top:16px; } summary { cursor:pointer; color:var(--accent); }
+.legend { font-size:0.88rem; color:var(--muted); }
+.howto { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:760px) { .howto { grid-template-columns:1fr; } }
+pre.tree { margin:0; font:0.82rem/1.5 ui-monospace,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+</style>
+</head>
+<body>
+<main>
+<h1>UML vs code: four App modules</h1>
+<p class="lede">BMW PCU48 (100554). Compares how <strong>DCDC_FSM</strong>, <strong>DCDC_Safety_Functions</strong>, <strong>Error_Check</strong> and <strong>SEV</strong> are described in the Enterprise Architect model <code>100554_BMW_DCDC_GEN3.qea</code> and in the C code (commit <code>39db4e93a</code>, analyzed with archrev 0.1.0). Read-only: nothing was written back to the model.</p>
+
+<section class="panel">
+  <h2>How each side describes a module</h2>
+  <div class="howto">
+    <div class="side uml"><h3>UML model (.qea)</h3>
+<pre class="tree">DCDC_Shared_Model/Component/MCU/Flex/APPL/&lt;Module&gt;/
+  BlackBox/
+    &lt;Module&gt;            Component («ASIL B» on safety modules)
+      ProvidedInterface  one per exported function
+      RequiredInterface  one per used signal / function
+  Interfaces/
+    &lt;fn&gt;  Interface «Function», 1 operation = signature
+  type_defs/
+    struct / enum / union classes (imported from a header)</pre>
+      <ul>
+        <li>The project view (<code>100554_BMW_DCDC_GEN3/Static_View/Component_Diagram/MainController/Appl/&lt;Module&gt;</code>) holds the component diagrams.</li>
+        <li>Features (<code>Features/FUSA/…</code>, <code>Features/SEV/…</code>) refer to modules as plain classes.</li>
+        <li>Required signals point to shared interfaces in <code>SYSTEM/Signals</code>, whose operations are <code>SP_Get_/SP_Set_/SP_Test_&lt;signal&gt;</code>.</li>
+        <li>Each module also has two copies under <code>Playground/ImportWork</code> and <code>Playground/import_</code>. They are ignored here.</li>
+        <li>Components and interfaces have no descriptive notes. A module's behavior is described only by diagrams.</li>
+      </ul>
+    </div>
+    <div class="side code"><h3>C code</h3>
+<pre class="tree">software/source/flex/appl/swc/
+  &lt;Module&gt;.c   implementation + RTE runnables
+  &lt;Module&gt;.h   public prototypes, macros, types
+software/source/generated/Rte_&lt;Module&gt;*.h
+  generated RTE ports (Rte_Read/Write/Call)</pre>
+      <ul>
+        <li><strong>Provided</strong> = functions and globals with external linkage. Runnables (<code>*_Main*</code>, <code>*_Init</code>) are called by the RTE/OS, not by App code.</li>
+        <li><strong>Required</strong> = everything the module calls, reads or writes outside itself: signal pool (<code>SP_*</code>), RTE ports, other SWCs, parameters (<code>PAR_*</code> in <code>cds_data</code>), drivers, BSW.</li>
+        <li>Extracted deterministically by archrev (libclang). Each dependency carries file:line evidence.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Summary</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Module</th><th>UML stereotype</th><th>UML provided</th><th>Code exported fns</th><th>Matching names</th><th>UML required used in code</th><th>Code calls not in UML</th><th>UML types in code</th><th>Code fns / NLOC / max CCN</th></tr></thead>
+    <tbody><tr><th scope="row"><a href="#DCDC_FSM">DCDC_FSM</a></th>
+<td>–</td>
+<td class="num">6</td><td class="num">6</td><td class="num">3</td>
+<td class="num">30/35 <span class="muted">(86%)</span></td>
+<td class="num">49/49</td>
+<td class="num">1/5</td>
+<td class="num">24 / 1353 / 34</td></tr><tr><th scope="row"><a href="#DCDC_Safety_Functions">DCDC_Safety_Functions</a></th>
+<td>ASIL B</td>
+<td class="num">3</td><td class="num">4</td><td class="num">2</td>
+<td class="num">40/41 <span class="muted">(98%)</span></td>
+<td class="num">26/27</td>
+<td class="num">0/0</td>
+<td class="num">35 / 1911 / 42</td></tr><tr><th scope="row"><a href="#Error_Check">Error_Check</a></th>
+<td>–</td>
+<td class="num">9</td><td class="num">14</td><td class="num">8</td>
+<td class="num">78/102 <span class="muted">(76%)</span></td>
+<td class="num">49/68</td>
+<td class="num">3/6</td>
+<td class="num">44 / 2482 / 90</td></tr><tr><th scope="row"><a href="#SEV">SEV</a></th>
+<td>ASIL B</td>
+<td class="num">2</td><td class="num">2</td><td class="num">2</td>
+<td class="num">22/22 <span class="muted">(100%)</span></td>
+<td class="num">18/18</td>
+<td class="num">0/0</td>
+<td class="num">14 / 413 / 17</td></tr></tbody>
+  </table></div>
+  <p class="legend">"Matching names": the same function name is a UML provided interface and an exported code function. A required interface counts as used when the code references its name, one of its operations, or an <code>SP_*_&lt;name&gt;</code> accessor. "Code calls not in UML" counts function calls and global reads/writes that no UML required interface names (macros and enum constants are not counted).</p>
+  <ul class="notes">
+    <li class="n-ok"><strong>SEV</strong> matches its model completely. It is also the most recently maintained component (2026-03).</li>
+    <li class="n-warn"><strong>The required side</strong> of the model lists signals and RTE ports, but not direct C calls between modules, to drivers or to <code>PAR_*</code> parameters. Most real coupling (e.g. DCDC_FSM → DCDC_Control) is therefore not in the model.</li>
+    <li class="n-bad"><strong>DCDC_FSM</strong> has drifted the most: only half of its provided interface matches, its type_defs come from another project, and its state machine doesn't match the code states.</li>
+    <li class="n-info"><strong>Naming:</strong> runnables are named differently in the model and the code (<code>DCDC_Safety_Functions_Init</code> vs <code>DCDC_SF_Init</code>). Any automated comparison needs an explicit name mapping instead of guessing.</li>
+  </ul>
+</section>
+
+<section class="module" id="DCDC_FSM">
+  <header class="mhead"><h2>DCDC_FSM</h2></header>
+  <p class="role">Operating state machine of the converter (init, standby, precharge, buck, boost, stop states). Commands DCDC_Control and the ramp library.</p>
+  <div class="twocol">
+    <div class="side uml">
+      <h3>In the UML model</h3>
+      <dl>
+        <dt>Component</dt><dd><code class="path">DCDC_Shared_Model/Component/MCU/Flex/APPL/DCDC_FSM/BlackBox</code></dd>
+        <dt>Last change</dt><dd>2021-03-17 (component element)</dd>
+        <dt>Provided / required</dt><dd>6 provided, 35 required interfaces</dd>
+        <dt>Type definitions</dt><dd>5 in <code>type_defs</code></dd>
+        <dt>Diagrams</dt><dd>28 (5 Component, 1 Deployment, 1 Logical, 2 Package, 19 Sequence)</dd>
+        <dt>Element description</dt><dd class="muted">empty (no notes on component or interfaces)</dd>
+      </dl>
+    </div>
+    <div class="side code">
+      <h3>In the C code</h3>
+      <dl>
+        <dt>Files</dt><dd><code class="path">software/source/flex/appl/swc/DCDC_FSM.c</code><br><code class="path">software/source/flex/appl/swc/DCDC_FSM.h</code></dd>
+        <dt>Exported</dt><dd>6 functions, 0 globals, 117 macros</dd>
+        <dt>Size</dt><dd>24 functions, 1353 NLOC, max CCN 34</dd>
+        <dt>Coupling</dt><dd>fan-out 28 modules, fan-in 8, instability 0.7778</dd>
+        <dt>Used by</dt><dd>Error_Check (12), AplDiag_Flex (11), DCDC_Control (9), DCDC_Safety_Functions (8), Safe_HCAN_TxRx (7), appl (2), HCAN_TxRx (2), SEV (2)</dd>
+      </dl>
+    </div>
+  </div>
+  <h3>Observations</h3>
+  <ul class="notes"><li class='n-bad'>UML provides <code>DCDC_FSM_Main_Fast_SysTick</code>, <code>DCDC_FSM_Check_HW_Fehler_M</code> and <code>DCDC_FSM_Reset_Logging_Data</code>. None of them exists anywhere in <code>software/source</code>.</li><li class='n-bad'>Code exports <code>DCDC_FSM_Main</code> (the cyclic runnable), <code>DCDC_FSM_NVM_Save</code> and <code>DCDC_FSM_Calculate_Log_Data</code>. None of them is in UML.</li><li class='n-warn'><code>DCDC_FSM_Get_Operating_Params</code> is in UML and in <code>DCDC_FSM.h</code>, but it is never defined or called.</li><li class='n-warn'>The 5 type_defs in UML were imported from another project (<code>Prj_100467\…\DCDC_FSM.h</code>). Only <code>dcdc_fsm_log_data_def</code> still exists in the code.</li><li class='n-warn'>Not one of the 49 direct calls and global accesses in the code is modeled: DCDC_Control, the <code>DCR_*</code> ramp library, <code>IO_*</code>, <code>PAR_*</code> parameters, <code>EC_Get_EC_Flags</code>. UML only lists signal-pool signals.</li><li class='n-bad'>The UML state machine and the code use different state sets (see table below).</li></ul>
+  <h3>Provided interface: UML vs code</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Function</th><th>Status</th><th>UML signature</th><th>Code location</th><th>Called by (App)</th></tr></thead>
+    <tbody><tr><td><code>DCDC_FSM_Calculate_Log_Data</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>DCDC_FSM.c:254</code></td><td>–</td></tr><tr><td><code>DCDC_FSM_Check_HW_Fehler_M</code></td><td><span class="chip bad">UML only</span></td><td><code class='sig'>void DCDC_FSM_Check_HW_Fehler_M(void)</code></td><td><code></code></td><td></td></tr><tr><td><code>DCDC_FSM_Get_FSM_State_History</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void DCDC_FSM_Get_FSM_State_History(u_08 *buffer)</code></td><td><code>DCDC_FSM.c:643</code></td><td>–</td></tr><tr><td><code>DCDC_FSM_Get_Operating_Params</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void DCDC_FSM_Get_Operating_Params(u_08 *buffer)</code></td><td><code>declared only</code></td><td>–</td></tr><tr><td><code>DCDC_FSM_Init</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void DCDC_FSM_Init(void)</code></td><td><code>DCDC_FSM.c:532</code></td><td>appl</td></tr><tr><td><code>DCDC_FSM_Main</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>DCDC_FSM.c:325</code></td><td>–</td></tr><tr><td><code>DCDC_FSM_Main_Fast_SysTick</code></td><td><span class="chip bad">UML only</span></td><td><code class='sig'>void DCDC_FSM_Main_Fast_SysTick(void)</code></td><td><code></code></td><td></td></tr><tr><td><code>DCDC_FSM_NVM_Save</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>DCDC_FSM.c:493</code></td><td>–</td></tr><tr><td><code>DCDC_FSM_Reset_Logging_Data</code></td><td><span class="chip bad">UML only</span></td><td><code class='sig'>void DCDC_FSM_Reset_Logging_Data(void)</code></td><td><code></code></td><td></td></tr></tbody></table></div>
+  <h3>Required interfaces in UML <span class="muted">(30/35 referenced in code)</span></h3>
+  <div class="chips"><span class="chip ok">BUCK_SEV_ACTIVE</span><span class="chip ok">DCDC_FSM_State</span><span class="chip ok">DCDC_FSM_State_Com</span><span class="chip ok">DCDC_Temp_Max</span><span class="chip ok">H_CAN_Is_Awake</span><span class="chip ok">I_Kl30</span><span class="chip ok">I_Max_LV</span><span class="chip ok">I_Max_Voltage_Derating</span><span class="chip ok">I_Nenn_LV</span><span class="chip warn">In_FEHLER_HW_M</span><span class="chip ok">P_In</span><span class="chip ok">P_Out</span><span class="chip ok">Precharge_Completed</span><span class="chip ok">Precharge_Error</span><span class="chip warn">PRECHARGE_TRYS_COUNTER</span><span class="chip ok">s_CTR_TAR_IGRAD_CNV</span><span class="chip ok">s_DCDC_1_enable</span><span class="chip ok">s_DCDC_2_enable</span><span class="chip ok">s_DCDC_Command</span><span class="chip ok">s_mvem_dc_sollspannung_mv</span><span class="chip ok">s_mvem_dc_sollstrom_mv</span><span class="chip ok">s_nvem_mv_dc_isoll_nv</span><span class="chip ok">s_nvem_mv_dc_usolllv</span><span class="chip ok">s_ST_RSU_CON</span><span class="chip ok">U_Kl30</span><span class="chip warn">U_Kl30_Controller</span><span class="chip ok">U_Kl40</span><span class="chip warn">U_Kl40_Controller</span><span class="chip warn">U_Kl40_FuSa</span><span class="chip ok">U_S1_1</span><span class="chip ok">U_S1_2</span><span class="chip ok">U_S1_3</span><span class="chip ok">U_S1_4</span><span class="chip ok">U_S2_1</span><span class="chip ok">U_S2_2</span></div>
+  <h3>Code dependencies not modeled in UML <span class="muted">(49 calls / global accesses)</span></h3>
+  <ul class="deps"><li><code>cds_data.c</code> <span class='muted'>(19)</span>: <code>PAR_I1_Boost_BN12</code>, <code>PAR_I1_Boost_BN48</code>, <code>PAR_I1_Buck_BN48</code>, <code>PAR_I2_SEV_BN12</code>, <code>PAR_I_Gradient_Normal</code>, <code>PAR_I_Gradient_Slow</code>, <code>PAR_I_Gradient_VerySlow</code>, <code>PAR_I_gradient_I_Peask_2s_To_normal_operation</code> …</li><li><code>signalpool.h</code> <span class='muted'>(11)</span>: <code>SP_Get_Signal_Bit</code>, <code>SP_Get_Signal_Byte</code>, <code>SP_Get_Signal_DWord</code>, <code>SP_Get_Signal_SDWord</code>, <code>SP_Get_Signal_SWord</code>, <code>SP_Get_Signal_SafeBit</code>, <code>SP_Get_Signal_Word</code>, <code>SP_Set_Signal_Bit</code> …</li><li><code>dc_ramps.h</code> <span class='muted'>(4)</span>: <code>DCR_Get_Flags</code>, <code>DCR_Start</code>, <code>DCR_Stop</code>, <code>DCR_Update</code></li><li><code>Rte_DCDC_FSM.h</code> <span class='muted'>(3)</span>: <code>Rte_DCDC_FSM_IF_DCDC_FSM_State_State</code>, <code>Rte_Error_Check_IF_EC_Critical_Error_State</code>, <code>Rte_Error_Check_IF_EC_Operation_locked_State</code></li><li><code>io_control.h</code> <span class='muted'>(3)</span>: <code>IO_Get_Output_State</code>, <code>IO_Set_Output_State</code>, <code>IO_Start_Fusi_Reset_Pulse</code></li><li><code>temp.h</code> <span class='muted'>(2)</span>: <code>Temp_Enable_Current_Limit</code>, <code>Temp_Get_Max_Current</code></li><li><code>wd_control.h</code> <span class='muted'>(2)</span>: <code>WD_Register_User</code>, <code>WD_Trigger</code></li><li><code>Dem.h</code> <span class='muted'>(1)</span>: <code>Dem_GetEventFailed</code></li><li><code>Error_Check.c</code> <span class='muted'>(1)</span>: <code>EC_Get_EC_Flags</code></li><li><code>ad_values.h</code> <span class='muted'>(1)</span>: <code>ADV_Get_Current_Offsets</code></li><li><code>dc_control.h</code> <span class='muted'>(1)</span>: <code>DC_CTRL_Error_Active</code></li><li><code>tle94x1_drv.h</code> <span class='muted'>(1)</span>: <code>TLE94X1_Request_Normal_Mode</code></li></ul>
+  <h3>Type definitions (UML <code>type_defs</code>)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Kind</th><th>Members</th><th>In module code</th><th>Imported from</th></tr></thead>
+    <tbody><tr><td><code>dcdc_fsm_log_data_def</code></td><td>struct</td><td class='num'>4</td><td><span class="chip ok">found</span></td><td><code class='path'>flex\appl\swc\DCDC_FSM.h</code></td></tr><tr><td><code>dcdc_fsm_log_temp_classes_def</code></td><td>Enumeration</td><td class='num'>12</td><td><span class="chip bad">not in code</span></td><td><code class='path'>flex\appl\swc\DCDC_FSM.h</code></td></tr><tr><td><code>dcdc_fsm_parameters_def</code></td><td>struct</td><td class='num'>44</td><td><span class="chip bad">not in code</span></td><td><code class='path'>flex\appl\swc\DCDC_FSM.h</code></td></tr><tr><td><code>Rte_ModeType_ECU_OpSt_Handler_Mode</code></td><td>typedef</td><td class='num'>0</td><td><span class="chip bad">not in code</span></td><td><code class='path'>F:\work\ea\for_import\Components\Rte_DCDC_FSM_Type.h</code></td></tr><tr><td><code>Rte_ModeType_ESH_Mode</code></td><td>typedef</td><td class='num'>0</td><td><span class="chip bad">not in code</span></td><td><code class='path'>F:\work\ea\for_import\Components\Rte_DCDC_FSM_Type.h</code></td></tr></tbody></table></div>
+  <details><summary>Diagrams showing DCDC_FSM</summary><ul class="diags"><li>Appl <span class='muted'>(Deployment) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Appl <span class='muted'>(Package) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Buck Mode <span class='muted'>(Logical) — Features/Buck Mode</span></li><li>Business Policy <span class='muted'>(Component) — Static_View/Feature_Diagram</span></li><li>DCDC Converter <span class='muted'>(Component) — Static_View/Feature_Diagram/DCDC Converter</span></li><li>DCDC_FSM <span class='muted'>(Component) — Static_View/Component_Diagram/MainController/Appl/DCDC_FSM</span></li><li>Interfaces <span class='muted'>(Component) — IFS/Interfaces</span></li><li>Monitoring <span class='muted'>(Component) — Features/FUSA/Monitoring</span></li><li>ST_AD_CALIBRATE <span class='muted'>(Sequence) — Dynamic_View/Features/Sub Feature/ST_AD_CALIBRATE/Sequence</span></li><li>ST_BATTERY_PULSE_12V <span class='muted'>(Sequence) — Dynamic_View/Features/Sub Feature/Normal_Operation/Sequence/ST_BATTERY_PULSE_12V</span></li><li class='muted'>… and 18 more</li></ul></details>
+</section>
+<section class="module" id="DCDC_Safety_Functions">
+  <header class="mhead"><h2>DCDC_Safety_Functions</h2><span class="chip asil">ASIL B</span></header>
+  <p class="role">ASIL B safety mechanisms: plausibility and limit checks on voltages, currents and temperatures; drives the FuSi enable outputs.</p>
+  <div class="twocol">
+    <div class="side uml">
+      <h3>In the UML model</h3>
+      <dl>
+        <dt>Component</dt><dd><code class="path">DCDC_Shared_Model/Component/MCU/Flex/APPL/DCDC_Safety_Functions/BlackBox</code></dd>
+        <dt>Last change</dt><dd>2026-03-24 (component element)</dd>
+        <dt>Provided / required</dt><dd>3 provided, 41 required interfaces</dd>
+        <dt>Type definitions</dt><dd>0 in <code>type_defs</code></dd>
+        <dt>Diagrams</dt><dd>13 (8 Component, 1 Deployment, 2 Logical, 2 Package)</dd>
+        <dt>Element description</dt><dd class="muted">empty (no notes on component or interfaces)</dd>
+      </dl>
+    </div>
+    <div class="side code">
+      <h3>In the C code</h3>
+      <dl>
+        <dt>Files</dt><dd><code class="path">software/source/flex/appl/swc/DCDC_Safety_Functions.c</code><br><code class="path">software/source/flex/appl/swc/DCDC_Safety_Functions.h</code></dd>
+        <dt>Exported</dt><dd>4 functions, 0 globals, 151 macros</dd>
+        <dt>Size</dt><dd>35 functions, 1911 NLOC, max CCN 42</dd>
+        <dt>Coupling</dt><dd>fan-out 19 modules, fan-in 1, instability 0.95</dd>
+        <dt>Used by</dt><dd>Error_Check (29)</dd>
+      </dl>
+    </div>
+  </div>
+  <h3>Observations</h3>
+  <ul class="notes"><li class='n-ok'>Best match on the required side: 40 of 41 required interfaces are used in the code.</li><li class='n-warn'>UML provides <code>DCDC_Safety_Functions_Init</code>. The code implements the init runnable as <code>DCDC_SF_Init</code> (the RTE runnable name).</li><li class='n-warn'><code>Rte_Read_IF_DCDC_SF_Errors_Data</code> is modeled as required but never called. The code only writes this port.</li><li class='n-warn'>26 calls and global accesses are not modeled, e.g. <code>IO_Set_Output_State</code>, <code>IO_Start_Fusi_Reset_Pulse</code>, <code>WD_Trigger</code>, <code>APD_Update_DID_Params_Struct</code> (AplDiag_Flex) and <code>PAR_*</code> limits. Some of these are safety-relevant (FuSi outputs, watchdog).</li><li class='n-info'>Max CCN 42 with 9 complexity findings, although it is ASIL B code.</li></ul>
+  <h3>Provided interface: UML vs code</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Function</th><th>Status</th><th>UML signature</th><th>Code location</th><th>Called by (App)</th></tr></thead>
+    <tbody><tr><td><code>DCDC_Safety_Functions_Init</code></td><td><span class="chip bad">UML only</span></td><td><code class='sig'>void DCDC_Safety_Functions_Init(void)</code></td><td><code></code></td><td></td></tr><tr><td><code>DCDC_Safety_Functions_Main_Fast</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void DCDC_Safety_Functions_Main_Fast(void)</code></td><td><code>DCDC_Safety_Functions.c:354</code></td><td>–</td></tr><tr><td><code>DCDC_Safety_Functions_Main_Slow</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void DCDC_Safety_Functions_Main_Slow(void)</code></td><td><code>DCDC_Safety_Functions.c:504</code></td><td>–</td></tr><tr><td><code>DCDC_SF_Check_Reset_Errors</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>DCDC_Safety_Functions.c:246</code></td><td>–</td></tr><tr><td><code>DCDC_SF_Init</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>DCDC_Safety_Functions.c:278</code></td><td>–</td></tr></tbody></table></div>
+  <h3>Required interfaces in UML <span class="muted">(40/41 referenced in code)</span></h3>
+  <div class="chips"><span class="chip ok">Assmbly_Mode_Err_Cnt</span><span class="chip ok">Assmbly_Mode_Err_Cnt_In</span><span class="chip ok">Assmbly_Mode_Integrity_Fault</span><span class="chip ok">DCDC_FSM_State</span><span class="chip ok">DCDC_SF_Calibration_Mode</span><span class="chip ok">DCDC_Temp_1_Water_Inlet</span><span class="chip ok">DCDC_Temp_2_S1</span><span class="chip ok">DCDC_Temp_3_Kl30</span><span class="chip ok">DCDC_Temp_4_Kl40</span><span class="chip ok">DCDC_Temp_5_PowerStages_Pos_3</span><span class="chip ok">DCDC_Temp_6_PowerStages_Pos_1</span><span class="chip ok">DCDC_Temp_7_Water_Outlet</span><span class="chip ok">I_Phase_1</span><span class="chip ok">I_Phase_2</span><span class="chip ok">I_Phase_3</span><span class="chip ok">I_Phase_4</span><span class="chip ok">I_Phase_5</span><span class="chip ok">I_Phase_6</span><span class="chip ok">I_Phase_7</span><span class="chip ok">I_Phase_8</span><span class="chip ok">In_FEHLER_HW_M</span><span class="chip ok">In_Kalibrier_Freigabe</span><span class="chip ok">Montagemode</span><span class="chip ok">Montagemode</span><span class="chip warn">Rte_Read_IF_DCDC_SF_Errors_Data</span><span class="chip ok">Rte_Write_IF_DCDC_SF_Errors_Data</span><span class="chip ok">Rte_Write_IF_DCDC_SF_Measurement_Check_Data</span><span class="chip ok">U_11V_M</span><span class="chip ok">U_Kl30_Controller</span><span class="chip ok">U_Kl30_FuSa</span><span class="chip ok">U_Kl40</span><span class="chip ok">U_Kl40_Controller</span><span class="chip ok">U_Pump_S1</span><span class="chip ok">U_Pump_S2</span><span class="chip ok">U_S1_1</span><span class="chip ok">U_S1_2</span><span class="chip ok">U_S1_3</span><span class="chip ok">U_S1_4</span><span class="chip ok">U_S2_1</span><span class="chip ok">U_S2_2</span><span class="chip ok">WD_Register_User</span></div>
+  <h3>Code dependencies not modeled in UML <span class="muted">(26 calls / global accesses)</span></h3>
+  <ul class="deps"><li><code>signalpool.h</code> <span class='muted'>(12)</span>: <code>SP_Get_Signal_Bit</code>, <code>SP_Get_Signal_Byte</code>, <code>SP_Get_Signal_DWord</code>, <code>SP_Get_Signal_SDWord</code>, <code>SP_Get_Signal_SWord</code>, <code>SP_Get_Signal_SafeBit</code>, <code>SP_Get_Signal_Word</code>, <code>SP_Set_Signal_Bit</code> …</li><li><code>cds_data.c</code> <span class='muted'>(6)</span>: <code>PAR_Self_induced_overvoltage_FHTI</code>, <code>PAR_U3_Boost_BN48</code>, <code>PAR_U4_Boost_BN48</code>, <code>PAR_U4_Buck_BN12</code>, <code>PAR_U_BN12_Overvoltage_ASIL</code>, <code>PAR_U_Boost_BN48_Hysteresis</code></li><li><code>io_control.h</code> <span class='muted'>(3)</span>: <code>IO_Get_Output_State</code>, <code>IO_Set_Output_State</code>, <code>IO_Start_Fusi_Reset_Pulse</code></li><li><code>Rte_DCDC_Safety_Functions.h</code> <span class='muted'>(2)</span>: <code>Rte_DCDC_Safety_Functions_IF_DCDC_SF_Errors_Data</code>, <code>Rte_DCDC_Safety_Functions_IF_DCDC_SF_Measurement_Check_Data</code></li><li><code>AplDiag_Flex.c</code> <span class='muted'>(1)</span>: <code>APD_Update_DID_Params_Struct</code></li><li><code>ad_values.h</code> <span class='muted'>(1)</span>: <code>ADV_Get_Calibration_Tag</code></li><li><code>wd_control.h</code> <span class='muted'>(1)</span>: <code>WD_Trigger</code></li></ul>
+  <h3>Type definitions (UML <code>type_defs</code>)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Kind</th><th>Members</th><th>In module code</th><th>Imported from</th></tr></thead>
+    <tbody><tr><td colspan='5' class='muted'>No type_defs package in UML.</td></tr></tbody></table></div>
+  <details><summary>Diagrams showing DCDC_Safety_Functions</summary><ul class="diags"><li>Appl <span class='muted'>(Deployment) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Appl <span class='muted'>(Package) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Assembly Mode <span class='muted'>(Component) — Features/FUSA/Assembly Mode/Static View</span></li><li>DCDC_Safety_Functions <span class='muted'>(Component) — Static_View/Component_Diagram/MainController/Appl/DCDC_Safety_Functions</span></li><li>DCDC_Safety_Functions <span class='muted'>(Component) — DCDC_Shared_Model/Component/MCU/Flex/APPL/DCDC_Safety_Functions</span></li><li>Fault Detection <span class='muted'>(Component) — Static_View/Feature_Diagram</span></li><li>Fault Detection <span class='muted'>(Component) — Static_View/Feature_Diagram/Component Diagnostics</span></li><li>Monitoring <span class='muted'>(Component) — Features/FUSA/Monitoring</span></li><li>Montage Mode <span class='muted'>(Component) — Features/Montage Mode_delete/Static View/Realization View</span></li><li>Persistent Safe State <span class='muted'>(Component) — Features/FUSA/Persistent Safe State</span></li><li class='muted'>… and 3 more</li></ul></details>
+</section>
+<section class="module" id="Error_Check">
+  <header class="mhead"><h2>Error_Check</h2></header>
+  <p class="role">Central error evaluation: collects error flags, sets DEM events/DTCs, handles CAN timeouts and the operation lock.</p>
+  <div class="twocol">
+    <div class="side uml">
+      <h3>In the UML model</h3>
+      <dl>
+        <dt>Component</dt><dd><code class="path">DCDC_Shared_Model/Component/MCU/Flex/APPL/Error_Check/BlackBox</code></dd>
+        <dt>Last change</dt><dd>2021-03-17 (component element)</dd>
+        <dt>Provided / required</dt><dd>9 provided, 102 required interfaces</dd>
+        <dt>Type definitions</dt><dd>6 in <code>type_defs</code></dd>
+        <dt>Diagrams</dt><dd>12 (8 Component, 1 Deployment, 1 Logical, 2 Package)</dd>
+        <dt>Element description</dt><dd class="muted">empty (no notes on component or interfaces)</dd>
+      </dl>
+    </div>
+    <div class="side code">
+      <h3>In the C code</h3>
+      <dl>
+        <dt>Files</dt><dd><code class="path">software/source/flex/appl/swc/Error_Check.c</code><br><code class="path">software/source/flex/appl/swc/Error_Check.h</code></dd>
+        <dt>Exported</dt><dd>14 functions, 1 globals, 216 macros</dd>
+        <dt>Size</dt><dd>44 functions, 2482 NLOC, max CCN 90</dd>
+        <dt>Coupling</dt><dd>fan-out 40 modules, fan-in 4, instability 0.9091</dd>
+        <dt>Used by</dt><dd>AplDiag_Flex (14), HCAN_TxRx (13), appl (4), DCDC_FSM (3)</dd>
+      </dl>
+    </div>
+  </div>
+  <h3>Observations</h3>
+  <ul class="notes"><li class='n-ok'>8 of 9 provided interfaces match exported code functions by name.</li><li class='n-warn'><code>EC_Reset_Critical_Error</code> is a provided interface in UML (added 2025-05-27), but it is <code>PRIVATE</code> (static) in <code>Error_Check.c:3471</code>.</li><li class='n-bad'><code>BswM_Cbk_BusOff_Entry_HCAN</code>/<code>Exit_HCAN</code> are modeled as <em>required</em>, but Error_Check <em>defines</em> them in <code>Error_Check.c:3580/3608</code>, so in the code they are provided.</li><li class='n-warn'>24 of 102 required interfaces are not referenced. Most appear in the code only in comments or commented-out lines (<code>U_Pump_S1</code>, <code>MPU_Check_Failed</code>). <code>Error_Check_DemEvents</code> is a 50-operation DEM interface that the code reaches through <code>DemConf_*</code> IDs, so a name match can't find it.</li><li class='n-warn'><code>EC_Get_Repetitive_Counters</code> (used by AplDiag_Flex and HCAN_TxRx) and <code>Error_Check_Init</code> are missing from UML.</li><li class='n-info'>The most heavily coupled module: 40 outgoing module dependencies, max CCN 90.</li></ul>
+  <h3>Provided interface: UML vs code</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Function</th><th>Status</th><th>UML signature</th><th>Code location</th><th>Called by (App)</th></tr></thead>
+    <tbody><tr><td><code>BswM_Cbk_BusOff_Entry_HCAN</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:3580</code></td><td>–</td></tr><tr><td><code>BswM_Cbk_BusOff_Exit_HCAN</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:3608</code></td><td>–</td></tr><tr><td><code>EC_Check_Condition_Pcu48_In_Pdugroup_0000080254_Active</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:3209</code></td><td>–</td></tr><tr><td><code>EC_Check_Dem_Memory</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void EC_Check_Dem_Memory(void)</code></td><td><code>Error_Check.c:3371</code></td><td>appl</td></tr><tr><td><code>EC_Get_EC_Flags</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>u_16 EC_Get_EC_Flags(void)</code></td><td><code>Error_Check.c:2092</code></td><td>DCDC_FSM</td></tr><tr><td><code>EC_Get_Repetitive_Counters</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:2105</code></td><td>AplDiag_Flex, HCAN_TxRx</td></tr><tr><td><code>EC_HCAN_Message_Received</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void EC_HCAN_Message_Received(void)</code></td><td><code>Error_Check.c:3565</code></td><td>appl</td></tr><tr><td><code>EC_Register_Dem_Memory</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void EC_Register_Dem_Memory(void)</code></td><td><code>Error_Check.c:3329</code></td><td>appl</td></tr><tr><td><code>EC_Reset_Critical_Error</code></td><td><span class="chip bad">UML only</span></td><td><code class='sig'>void EC_Reset_Critical_Error(void)</code></td><td><code></code></td><td></td></tr><tr><td><code>EC_Reset_Repetitive_Errors</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void EC_Reset_Repetitive_Errors(void)</code></td><td><code>Error_Check.c:3484</code></td><td>AplDiag_Flex</td></tr><tr><td><code>Error_Check_DiagnosticEventTrigger_GeneralCallbackEventUdsStatusChanged</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:476</code></td><td>–</td></tr><tr><td><code>Error_Check_Init</code></td><td><span class="chip warn">code only</span></td><td><code class='sig'></code></td><td><code>Error_Check.c:776</code></td><td>–</td></tr><tr><td><code>Error_Check_Main_Fast</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void Error_Check_Main_Fast(void)</code></td><td><code>Error_Check.c:987</code></td><td>–</td></tr><tr><td><code>Error_Check_Main_Slow</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void Error_Check_Main_Slow(void)</code></td><td><code>Error_Check.c:1795</code></td><td>–</td></tr><tr><td><code>Error_Check_NVM_Save</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void Error_Check_NVM_Save(void)</code></td><td><code>Error_Check.c:1873</code></td><td>–</td></tr></tbody></table></div>
+  <h3>Required interfaces in UML <span class="muted">(78/102 referenced in code)</span></h3>
+  <div class="chips"><span class="chip warn">Assmbly_Mode_Err_Cnt</span><span class="chip ok">Assmbly_Mode_Err_Cnt_In</span><span class="chip ok">Assmbly_Mode_Integrity_Fault</span><span class="chip warn">BswM_Cbk_BusOff_Entry_HCAN</span><span class="chip warn">BswM_Cbk_BusOff_Exit_HCAN</span><span class="chip ok">BUCK_SEV_ACTIVE</span><span class="chip ok">CEH_Disable_DM_ipdu</span><span class="chip ok">CEH_Enable_DM_ipdu</span><span class="chip ok">CEH_Get_Rcvd_Once_Flag</span><span class="chip ok">CEH_Reset_DM_Counters_ipdu</span><span class="chip ok">CEH_Reset_Rcvd_Once_Flags_ipdu</span><span class="chip ok">CEH_Reset_Timeout_Flags_ipdu</span><span class="chip ok">DCDC_FSM_State</span><span class="chip ok">DCDC_SF_Calibration_Mode</span><span class="chip ok">DCDC_Temp_2_S1</span><span class="chip ok">DCDC_Temp_3_Kl30</span><span class="chip ok">DCDC_Temp_4_Kl40</span><span class="chip ok">DCDC_Temp_5_PowerStages_Pos_3</span><span class="chip ok">DCDC_Temp_6_PowerStages_Pos_1</span><span class="chip ok">Dem_GetEventFailed</span><span class="chip ok">Dem_GetEventStatus</span><span class="chip ok">Dem_GetOperationCycleState</span><span class="chip ok">Dem_NvM_InitAdminData</span><span class="chip ok">Dem_NvM_InitStatusData</span><span class="chip ok">Dem_SetEventStatus</span><span class="chip ok">Dem_SetOperationCycleState</span><span class="chip ok">Development_Messages_Active</span><span class="chip ok">DID_402E_COUNTER</span><span class="chip ok">ECU_IsAwake</span><span class="chip warn">Error_Check_DemEvents</span><span class="chip ok">H_CAN_BusOff</span><span class="chip ok">H_CAN_Diagnostics_Active</span><span class="chip ok">H_CAN_Is_Awake</span><span class="chip ok">H_CAN_NetworkRequested</span><span class="chip ok">I_Kl30</span><span class="chip warn">I_Kl40_Measurement</span><span class="chip ok">I_Max_Voltage_Derating</span><span class="chip ok">I_Phase_1</span><span class="chip ok">I_Phase_2</span><span class="chip ok">I_Phase_3</span><span class="chip ok">I_Phase_4</span><span class="chip ok">I_Phase_5</span><span class="chip ok">I_Phase_6</span><span class="chip ok">I_Phase_7</span><span class="chip ok">I_Phase_8</span><span class="chip warn">In_FEHLER_HW_M</span><span class="chip warn">IO_Set_HW_Test_1</span><span class="chip warn">IO_Set_HW_Test_2</span><span class="chip warn">IO_Set_HW_Test_3</span><span class="chip warn">IO_Set_HW_Test_4</span><span class="chip warn">IO_Set_Reset_HW_Fehler_State</span><span class="chip ok">KOMMANDIERUNG_AKTIV</span><span class="chip ok">Montagemode</span><span class="chip warn">MPU_Check_Failed</span><span class="chip ok">NVM_Check_Failed</span><span class="chip ok">NvM_GetErrorStatus</span><span class="chip ok">NvM_GetErrorStatus</span><span class="chip ok">NvM_ReadBlock</span><span class="chip ok">NvM_RegisterBlock</span><span class="chip ok">NvM_RegisterBlock</span><span class="chip warn">PL_Get_Flags</span><span class="chip ok">Precharge_Completed</span><span class="chip ok">Precharge_Error</span><span class="chip warn">PRECHARGE_TRYS_COUNTER</span><span class="chip ok">RAM_Check_Failed</span><span class="chip ok">ROM_Check_Failed</span><span class="chip warn">Rte_Read_IF_DCDC_FSM_State_State</span><span class="chip ok">Rte_Read_IF_DCDC_SF_Errors_Data</span><span class="chip ok">Rte_Read_IF_DCDC_SF_Measurement_Check_Data</span><span class="chip ok">Rte_Write_IF_EC_Critical_Error_State</span><span class="chip ok">Rte_Write_IF_EC_Operation_locked_State</span><span class="chip warn">s_DCDC_Command</span><span class="chip ok">s_Diag_Reset</span><span class="chip ok">s_ecu_runtime_error</span><span class="chip ok">s_PRM_ERR_ENBN_CNV</span><span class="chip ok">s_PWF_State</span><span class="chip ok">s_repetitive_ecu_runtime_error</span><span class="chip ok">s_Reset_due_to_loss_of_power</span><span class="chip ok">s_SRT_ERR_ENBN_CNV</span><span class="chip ok">s_ST_RSU_CON</span><span class="chip ok">Signal_Pool_Get_IF</span><span class="chip ok">Signal_Pool_Set_IF</span><span class="chip ok">Startup_Delay_100ms</span><span class="chip ok">Temp_Get_temp_flags</span><span class="chip ok">TO_CANAR</span><span class="chip ok">U_11V_M</span><span class="chip ok">U_Kl30</span><span class="chip ok">U_Kl40</span><span class="chip warn">U_Pump_S1</span><span class="chip warn">U_Pump_S2</span><span class="chip warn">U_S1_1</span><span class="chip warn">U_S1_2</span><span class="chip warn">U_S1_3</span><span class="chip warn">U_S1_4</span><span class="chip warn">U_S2_1</span><span class="chip warn">U_S2_2</span><span class="chip ok">Water_Temp_Max</span><span class="chip ok">WD_Register_User</span><span class="chip ok">WD_Trigger</span><span class="chip ok">XCP_Active</span><span class="chip ok">ZIMH_CTR_TAR_U_BN_12V</span><span class="chip ok">ZIMH_CTR_TAR_U_BN_48V</span></div>
+  <h3>Code dependencies not modeled in UML <span class="muted">(49 calls / global accesses)</span></h3>
+  <ul class="deps"><li><code>cds_data.c</code> <span class='muted'>(14)</span>: <code>PAR_U1_Boost_BN12</code>, <code>PAR_U1_Boost_BN48</code>, <code>PAR_U1_Buck_BN12</code>, <code>PAR_U1_Buck_BN48</code>, <code>PAR_U1_OUT_SEV_BN12</code>, <code>PAR_U3_Boost_BN48</code>, <code>PAR_U4_Boost_BN12</code>, <code>PAR_U4_Boost_BN48</code> …</li><li><code>signalpool.h</code> <span class='muted'>(10)</span>: <code>SP_Get_Signal_Bit</code>, <code>SP_Get_Signal_Byte</code>, <code>SP_Get_Signal_SDWord</code>, <code>SP_Get_Signal_SWord</code>, <code>SP_Get_Signal_SafeBit</code>, <code>SP_Get_Signal_SafeByte</code>, <code>SP_Get_Signal_Word</code>, <code>SP_Set_Signal_Bit</code> …</li><li><code>Rte_Error_Check.h</code> <span class='muted'>(9)</span>: <code>ComM_GetCurrentComMode</code>, <code>ComM_GetCurrentPNCComMode</code>, <code>Rte_DCDC_Safety_Functions_IF_DCDC_SF_Errors_Data</code>, <code>Rte_DCDC_Safety_Functions_IF_DCDC_SF_Measurement_Check_Data</code>, <code>Rte_Error_Check_IF_EC_Critical_Error_State</code>, <code>Rte_Error_Check_IF_EC_Operation_locked_State</code>, <code>Rte_Mode_Error_Check_Notification_SwcModeNotification_DcmCommunicationControl_DcmCommunicationControl_ComMConf_ComMChannel_con_PCU48_CAN_ZIM_H_3_29a60410</code>, <code>Rte_Write_Error_Check_ec_op_locked_MESSCAN_DevMsg_19_ec_op_locked</code> …</li><li><code>Dem_Lcfg.h</code> <span class='muted'>(4)</span>: <code>Dem_Cfg_AdminData</code>, <code>Dem_Cfg_MemoryEntryInit</code>, <code>Dem_Cfg_NvBlockDataPtr</code>, <code>Dem_Cfg_NvBlockId</code></li><li><code>Dem.h</code> <span class='muted'>(3)</span>: <code>Dem_ClearDTC</code>, <code>Dem_RequestNvSynchronization</code>, <code>Dem_SelectDTC</code></li><li><code>ad_values.h</code> <span class='muted'>(2)</span>: <code>ADV_Get_Flags</code>, <code>ADV_Get_Result</code></li><li><code>dc_control.h</code> <span class='muted'>(2)</span>: <code>DC_CTRL_Error_Active</code>, <code>DC_CTRL_Get_I_Phase</code></li><li><code>AplDiag_Flex.c</code> <span class='muted'>(1)</span>: <code>APD_Update_DID_Params_Struct</code></li><li><code>Nm.h</code> <span class='muted'>(1)</span>: <code>Nm_GetState</code></li><li><code>NvM.h</code> <span class='muted'>(1)</span>: <code>NvM_WriteBlock</code></li><li><code>io_control.h</code> <span class='muted'>(1)</span>: <code>IO_Get_Output_State</code></li><li><code>temp.h</code> <span class='muted'>(1)</span>: <code>Temp_Get_Max_Current</code></li></ul>
+  <h3>Type definitions (UML <code>type_defs</code>)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Kind</th><th>Members</th><th>In module code</th><th>Imported from</th></tr></thead>
+    <tbody><tr><td><code>ec_check_signal_values</code></td><td>Enumeration</td><td class='num'>25</td><td><span class="chip bad">not in code</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr><tr><td><code>ec_check_signals_config_def</code></td><td>struct</td><td class='num'>4</td><td><span class="chip ok">found</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr><tr><td><code>ec_error_flags_def</code></td><td>struct</td><td class='num'>59</td><td><span class="chip ok">found</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr><tr><td><code>ec_error_flags_union_def</code></td><td>union</td><td class='num'>2</td><td><span class="chip ok">found</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr><tr><td><code>ec_odo_timestamp_def</code></td><td>struct</td><td class='num'>8</td><td><span class="chip bad">not in code</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr><tr><td><code>ec_standard_freeze_frame_def</code></td><td>struct</td><td class='num'>1</td><td><span class="chip bad">not in code</span></td><td><code class='path'>F:\work\ea\for_import\swc\Error_Check.h</code></td></tr></tbody></table></div>
+  <details><summary>Diagrams showing Error_Check</summary><ul class="diags"><li>Alternate Fault Management <span class='muted'>(Component) — Static_View/Feature_Diagram/Component Diagnostics</span></li><li>Appl <span class='muted'>(Deployment) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Appl <span class='muted'>(Package) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Assembly Mode <span class='muted'>(Component) — Features/FUSA/Assembly Mode/Static View</span></li><li>Error_Check <span class='muted'>(Component) — Static_View/Component_Diagram/MainController/Appl/Error_Check</span></li><li>Fault Reporting <span class='muted'>(Component) — Static_View/Feature_Diagram</span></li><li>Fault Reporting <span class='muted'>(Component) — Static_View/Feature_Diagram/Component Diagnostics</span></li><li>Monitoring <span class='muted'>(Component) — Features/FUSA/Monitoring</span></li><li>Persistent Safe State <span class='muted'>(Component) — Features/FUSA/Persistent Safe State</span></li><li>Persistent Safe State <span class='muted'>(Logical) — Features/FUSA/Persistent Safe State</span></li><li class='muted'>… and 2 more</li></ul></details>
+</section>
+<section class="module" id="SEV">
+  <header class="mhead"><h2>SEV</h2><span class="chip asil">ASIL B</span></header>
+  <p class="role">Safe energy supply (SEV) mode: evaluates the SEV request and reports SEV state and performance (ASIL B).</p>
+  <div class="twocol">
+    <div class="side uml">
+      <h3>In the UML model</h3>
+      <dl>
+        <dt>Component</dt><dd><code class="path">DCDC_Shared_Model/Component/MCU/Flex/APPL/SEV/BlackBox</code></dd>
+        <dt>Last change</dt><dd>2026-03-25 (component element)</dd>
+        <dt>Provided / required</dt><dd>2 provided, 22 required interfaces</dd>
+        <dt>Type definitions</dt><dd>0 in <code>type_defs</code></dd>
+        <dt>Diagrams</dt><dd>5 (2 Component, 1 Logical, 2 Package)</dd>
+        <dt>Element description</dt><dd class="muted">empty (no notes on component or interfaces)</dd>
+      </dl>
+    </div>
+    <div class="side code">
+      <h3>In the C code</h3>
+      <dl>
+        <dt>Files</dt><dd><code class="path">software/source/flex/appl/swc/SEV.c</code><br><code class="path">software/source/flex/appl/swc/SEV.h</code><br><code class="path">software/source/flex/appl/swc/SEV_Cfg.h</code></dd>
+        <dt>Exported</dt><dd>2 functions, 0 globals, 40 macros</dd>
+        <dt>Size</dt><dd>14 functions, 413 NLOC, max CCN 17</dd>
+        <dt>Coupling</dt><dd>fan-out 13 modules, fan-in 4, instability 0.7647</dd>
+        <dt>Used by</dt><dd>DCDC_Control (10), AplDiag_Flex (2), DCDC_FSM (2), Error_Check (2)</dd>
+      </dl>
+    </div>
+  </div>
+  <h3>Observations</h3>
+  <ul class="notes"><li class='n-ok'>Full match: both provided runnables (<code>SEV_Init</code>, <code>SEV_Main</code>) exist, and all 22 required interfaces are used in the code.</li><li class='n-info'>The UML component was updated on 2026-03-25, the most recent of the four.</li><li class='n-warn'>The 18 code accesses that are not modeled are parameters (<code>PAR_*</code>), generic signal-pool accessors (<code>SP_Get_Signal_*</code>) and one RTE variable. These are the same blind spots as in the other modules.</li><li class='n-info'>The model doesn't record that SEV is used by DCDC_Control, DCDC_FSM, Error_Check and AplDiag_Flex (incoming dependencies).</li></ul>
+  <h3>Provided interface: UML vs code</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Function</th><th>Status</th><th>UML signature</th><th>Code location</th><th>Called by (App)</th></tr></thead>
+    <tbody><tr><td><code>SEV_Init</code></td><td><span class="chip ok">both</span></td><td><code class='sig'></code></td><td><code>SEV.c:156</code></td><td>–</td></tr><tr><td><code>SEV_Main</code></td><td><span class="chip ok">both</span></td><td><code class='sig'>void SEV_Main(void)</code></td><td><code>SEV.c:209</code></td><td>–</td></tr></tbody></table></div>
+  <h3>Required interfaces in UML <span class="muted">(22/22 referenced in code)</span></h3>
+  <div class="chips"><span class="chip ok">BUCK_SEV_ACTIVE</span><span class="chip ok">DCDC_FSM_State</span><span class="chip ok">DCDC_Temp_2_S1</span><span class="chip ok">DCDC_Temp_3_Kl30</span><span class="chip ok">DCDC_Temp_4_Kl40</span><span class="chip ok">DCDC_Temp_5_PowerStages_Pos_3</span><span class="chip ok">DCDC_Temp_6_PowerStages_Pos_1</span><span class="chip ok">DCDC_Temp_Max</span><span class="chip ok">Rte_Read_IF_EC_Operation_locked_State</span><span class="chip ok">s_RequestEnergySupplySafety</span><span class="chip ok">s_RequestEnergySupplySafetyValid</span><span class="chip ok">s_SEV_MODE_WRONG</span><span class="chip ok">s_SEV_Performance_OK</span><span class="chip ok">s_SEV_Performance_Prediction_OK</span><span class="chip ok">s_SEV_Request</span><span class="chip ok">s_SEV_Request_Timeout</span><span class="chip ok">s_StatusEnergySupplyPCU48</span><span class="chip ok">SEV_State</span><span class="chip ok">TO_CTR_CNV_48V</span><span class="chip ok">TO_CTR_CNV_48V_2</span><span class="chip ok">U_Kl30</span><span class="chip ok">U_Kl40</span></div>
+  <h3>Code dependencies not modeled in UML <span class="muted">(18 calls / global accesses)</span></h3>
+  <ul class="deps"><li><code>signalpool.h</code> <span class='muted'>(11)</span>: <code>SP_Get_Signal_Bit</code>, <code>SP_Get_Signal_Byte</code>, <code>SP_Get_Signal_SWord</code>, <code>SP_Get_Signal_SafeBit</code>, <code>SP_Get_Signal_SafeBit_Errorflag</code>, <code>SP_Get_Signal_SafeByte</code>, <code>SP_Get_Signal_Word</code>, <code>SP_Set_Signal_Bit</code> …</li><li><code>cds_data.c</code> <span class='muted'>(6)</span>: <code>PAR_Temp_Ambient_min</code>, <code>PAR_Temp_Degradation_end</code>, <code>PAR_U1_SEV_BN48</code>, <code>PAR_U2_Buck_BN12</code>, <code>PAR_U2_SEV_BN48</code>, <code>PAR_U5_Buck_BN12</code></li><li><code>Rte_SEV.h</code> <span class='muted'>(1)</span>: <code>Rte_Error_Check_IF_EC_Operation_locked_State</code></li></ul>
+  <h3>Type definitions (UML <code>type_defs</code>)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Kind</th><th>Members</th><th>In module code</th><th>Imported from</th></tr></thead>
+    <tbody><tr><td colspan='5' class='muted'>No type_defs package in UML.</td></tr></tbody></table></div>
+  <details><summary>Diagrams showing SEV</summary><ul class="diags"><li>Appl <span class='muted'>(Package) — Static_View/Component_Diagram/MainController/Appl</span></li><li>Realization View <span class='muted'>(Component) — Features/SEV/Static View/Realization View</span></li><li>SEV <span class='muted'>(Component) — DCDC_Shared_Model/Component/MCU/Flex/APPL/SEV</span></li><li>SEV <span class='muted'>(Logical) — Features/SEV/Static View/Feature View</span></li><li>TopLevel Overview <span class='muted'>(Package) — Static_View/TopLevel Overview</span></li></ul></details>
+</section>
+
+<section class="module" id="statemachine">
+  <header class="mhead"><h2>DCDC_FSM: state machine</h2></header>
+  <p class="role">UML holds a state machine under <code>Dynamic_View/StateManagement</code> (17 states; 104 trigger elements across two copies of the package). The code defines its states as <code>DCDC_FSM_STATE_*</code> macros in <code>DCDC_FSM.h:40–57</code>.</p>
+  <div class="twocol">
+    <div class="side uml"><h3>UML states (17)</h3><div class="chips"><span class="chip bad">BATTERY_PULSE_12V</span><span class="chip bad">BATTERY_PULSE_12V_STOP</span><span class="chip ok">BOOST</span><span class="chip ok">BOOST_STOP</span><span class="chip ok">BUCK</span><span class="chip ok">BUCK_STOP</span><span class="chip bad">DISCHARGE_BUCK</span><span class="chip bad">EMERGENCY_MODE</span><span class="chip bad">MV_ON</span><span class="chip bad">PRECHARGE_BOOST</span><span class="chip bad">RSU_MODE</span><span class="chip bad">START_SUPPORT_12V</span><span class="chip bad">START_SUPPORT_12V_STOP</span><span class="chip bad">START_SUPPORT_48V</span><span class="chip bad">START_SUPPORT_48V_STOP</span><span class="chip bad">SUPPORT_12V</span><span class="chip bad">SUPPORT_12V_STOP</span></div></div>
+    <div class="side code"><h3>Code states (18)</h3><div class="chips"><span class="chip warn">INIT</span><span class="chip warn">STANDBY_PASSIVE</span><span class="chip warn">SLEEP</span><span class="chip warn">ERROR</span><span class="chip warn">ZK_PRECHARGE_LINEAR</span><span class="chip warn">BOOST_LOWVOLT</span><span class="chip warn">STANDBY_ACTIVE</span><span class="chip ok">BUCK</span><span class="chip ok">BOOST</span><span class="chip warn">DIAGNOSE_MODE_STANDBY</span><span class="chip warn">NOTBETRIEB</span><span class="chip warn">DIAGNOSE_MODE_BOOST</span><span class="chip warn">DIAGNOSE_MODE_BUCK</span><span class="chip warn">ZK_PRECHARGE_BOOST</span><span class="chip warn">ZK_PRECHARGE_STOP</span><span class="chip warn">AD_CALIBRATE</span><span class="chip ok">BUCK_STOP</span><span class="chip ok">BOOST_STOP</span></div></div>
+  </div>
+  <ul class="notes">
+    <li class="n-bad">Only 4 state names are identical (BOOST, BOOST_STOP, BUCK, BUCK_STOP). <code>PRECHARGE_BOOST</code> ↔ <code>ZK_PRECHARGE_BOOST</code> and <code>EMERGENCY_MODE</code> ↔ <code>NOTBETRIEB</code> are probably the same state under a different name.</li>
+    <li class="n-warn">The code has no START_SUPPORT_12V/48V, BATTERY_PULSE_12V, SUPPORT_12V, RSU_MODE or MV_ON states. In the code, RSU and start support are conditions or counters (<code>DCDC_FSM.c:369</code>, <code>DCDC_FSM.h:225</code>), not states.</li>
+    <li class="n-warn">The UML has no STANDBY, SLEEP, ERROR, DIAGNOSE_MODE_* or AD_CALIBRATE states. Some of these appear only as sequence diagrams (e.g. <code>ST_AD_CALIBRATE</code>).</li>
+    <li class="n-info">Trigger guards reference real code symbols (<code>dcdc_fsm_parameters.p_U_LV_Enter_Support_12V</code>, <code>Get_U_Kl30()</code>), but the code no longer has <code>dcdc_fsm_parameters</code>. The thresholds are now <code>PAR_*</code> in <code>cds_data</code>.</li>
+  </ul>
+</section>
+
+<section class="panel">
+  <h2>Method and limits</h2>
+  <ul>
+    <li>UML facts were read with SQL from the <code>.qea</code> (SQLite) tables <code>t_object</code>, <code>t_operation</code>, <code>t_operationparams</code>, <code>t_attribute</code>, <code>t_diagramobjects</code> and <code>t_package</code>. Only the <code>DCDC_Shared_Model/Component/MCU/Flex/APPL</code> component is compared. Playground copies are ignored.</li>
+    <li>Code facts come from <code>archrev analyze</code> outputs (<code>model.json</code>) for the release profile. Code disabled by the active defines is not seen.</li>
+    <li>Matching is by exact name, plus <code>SP_*_&lt;signal&gt;</code> accessors for signal interfaces. A signal reached through generic accessors such as <code>SP_Get_Signal_Word(SignalID_x)</code>, or a DEM event reached through <code>DemConf_*</code> IDs, shows as "not referenced" even though it may be used.</li>
+    <li>"Not in code" for type_defs means the type name doesn't appear in the module's own .c/.h files.</li>
+    <li>The working tree had uncommitted deletions outside <code>software/</code> (Cantata). They don't affect these modules.</li>
+  </ul>
+</section>
+</main>
+</body>
+</html>

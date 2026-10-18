@@ -1,0 +1,4 @@
+# Accepted archrev findings for 100554_mc_appl. One entry per fingerprint, approved by a person.
+# Draft new entries with: archrev baseline-draft --in archrev-out/<Module>
+baseline_version: 1
+accepted: []

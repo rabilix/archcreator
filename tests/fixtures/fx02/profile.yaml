@@ -1,0 +1,21 @@
+profile_version: 1
+name: fx02
+scope: src/App
+compile:
+  working_dir: src
+  include_dirs: [App, lib]
+  args: ["-std=c11"]
+build_list:
+  makefile: src/build.mk
+  variables: [SRC_APP]
+  base_dir: src
+modules:
+  prefix_aliases: {alpha: [a_]}
+signal_pool:
+  header: src/lib/signals.h
+  accessors:
+    - {macro: "SP_Set_{signal}_Errorflag", access: error_write}
+    - {macro: "SP_Test_{signal}_Errorflag", access: error_read}
+    - {macro: "SP_Get_{signal}", access: read}
+    - {macro: "SP_Set_{signal}", access: write}
+    - {macro: "SP_Test_{signal}", access: test}

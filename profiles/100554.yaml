@@ -1,0 +1,180 @@
+# Target profile: BMW PCU48 (100554_mc_appl), reference variant = Release (Release_Build.bat).
+# Sources of truth:
+#   include_dirs  = union of software/source/100554_settings.lnt (-I) and 100554.mak (INCPATH);
+#                   dirs listed there but absent on disk are omitted (os, Dbg, DcmFbl, Dlt, Lin*, Rtm, vItaHlp)
+#   defines       = Diab compatibility shim from 100554_settings.lnt + Release defines from 100554.mak
+#   build_list    = CSRC_FLEX + CSRC_BSW + ASRC in 100554.mak
+profile_version: 1
+name: "100554-release"
+# Repositories this central profile applies to (archrev picks it when --profile is not given).
+match:
+  git_remotes: ["git@bitbucket.org:bitbucket-flex/100554_mc_appl.git"]
+  repo_names: ["100554_mc_appl"]
+# Folders whose .c files are modules; /flex is the start, delivered applications are added here as further entries.
+scope:
+  - software/source/flex
+# Accepted findings (human decisions); empty until the first review round. Draft: archrev baseline-draft.
+baseline: 100554.baseline.yaml
+
+compile:
+  working_dir: software/source
+  args:
+    - "-std=gnu11"
+    - "--target=powerpc-unknown-eabi"
+    - "-ferror-limit=0"
+    # Diab compatibility shim, part 2 (needed by flex/system and flex/global, not by flex/appl):
+    # X-macro tables (MemIf.c) nest deeper than clang's default of 256 brackets.
+    - "-fbracket-depth=4096"
+    # Diab accepts a call before any declaration (main.c calls SP_Init without signalpool.h); clang makes it an error.
+    - "-Wno-error=implicit-function-declaration"
+  defines:
+    # Diab compatibility shim (mirrors 100554_settings.lnt)
+    - "__inline__="
+    - "__ppc"
+    - "__interrupt__="
+    - "__attribute__(v)="
+    # utils.c declares the byte-swap builtins as ordinary functions for analysis tools; clang refuses a
+    # conflicting redeclaration of a builtin, so they get plain names here.
+    - "__builtin_bswap16=diab_builtin_bswap16"
+    - "__builtin_bswap32=diab_builtin_bswap32"
+    # Release build defines (100554.mak, SW_FULL_ACCESS_MODE=1, DEBUG unset)
+    - "SW_FULL_ACCESS_MODE"
+    - "BRS_COMP_DIABDATA"
+  system_include_dirs:
+    # Machine-specific: Wind River Diab 5.9.9.0 installation
+    - "F:/Programme/WindRiver_5_9/diab/5.9.9.0/include"
+    - "F:/Programme/WindRiver_5_9/diab/5.9.9.0/include/diab"
+    - "F:/Programme/WindRiver_5_9/diab/5.9.9.0/include/dinkum/c"
+  include_dirs:
+    - bsw
+    - bsw/BAC
+    - flex/appl
+    - flex/appl/swc
+    - flex/driver
+    - flex/global
+    - flex/system
+    - flex/dcdc_pcu48
+    - generated
+    - generated/simulink
+    - generated/Components
+    - ../../bmw_bac_sip/Components/_Common/Implementation
+    - ../../bmw_bac_sip/Components/Com/Implementation
+    - ../../bmw_bac_sip/Components/Crc/Implementation
+    - ../../bmw_bac_sip/Components/Dem/Implementation
+    - ../../bmw_bac_sip/Components/Det/Implementation
+    - ../../bmw_bac_sip/Components/E2E/Implementation
+    - ../../bmw_bac_sip/Components/Os/Implementation
+    - ../../bmw_bac_sip/Components/vSecPrim/Implementation
+    - ../../bmw_bac_sip/Components/BswM/Implementation
+    - ../../bmw_bac_sip/Components/Can_30_Mcan/Implementation
+    - ../../bmw_bac_sip/Components/CanIf/Implementation
+    - ../../bmw_bac_sip/Components/CanNm/Implementation
+    - ../../bmw_bac_sip/Components/CanSM/Implementation
+    - ../../bmw_bac_sip/Components/CanTp/Implementation
+    - ../../bmw_bac_sip/Components/CanTrcv_30_Generic/Implementation
+    - ../../bmw_bac_sip/Components/CanTSyn/Implementation
+    - ../../bmw_bac_sip/Components/CanXcp/Implementation
+    - ../../bmw_bac_sip/Components/ComM/Implementation
+    - ../../bmw_bac_sip/Components/CryIf/Implementation
+    - ../../bmw_bac_sip/Components/Crypto_30_LibCv/Implementation
+    - ../../bmw_bac_sip/Components/Csm/Implementation
+    - ../../bmw_bac_sip/Components/Dcm/Implementation
+    - ../../bmw_bac_sip/Components/E2EXf/Implementation
+    - ../../bmw_bac_sip/Components/EcuM/Implementation
+    - ../../bmw_bac_sip/Components/IpduM/Implementation
+    - ../../bmw_bac_sip/Components/KeyM/Implementation
+    - ../../bmw_bac_sip/Components/Mcal_Spc58xxy/Implementation
+    - ../../bmw_bac_sip/Components/Nm/Implementation
+    - ../../bmw_bac_sip/Components/PduR/Implementation
+    - ../../bmw_bac_sip/Components/SecOC/Implementation
+    - ../../bmw_bac_sip/Components/StbM/Implementation
+    - ../../bmw_bac_sip/Components/vDem42/Implementation
+    - ../../bmw_bac_sip/Components/vMem_30_Mpc574xg/Implementation
+    - ../../bmw_bac_sip/Components/vMemAccM/Implementation
+    - ../../bmw_bac_sip/Components/VStdLib/Implementation
+    - ../../bmw_bac_sip/Components/Xcp/Implementation
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/templates/Template_Common/BAC_Common/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Bs/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Bs/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Bs/generic/src
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Crypto/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Crypto/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/DlogAppl/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/DlogAppl/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/DlogAppl/classic.sample/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/DlogShared/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/generic/include/BUtil
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/generic/include/extern
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/generic/include/extern/BUtil
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/BUtil/classic/include/extern
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Omc/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Omc/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/CdcClient/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/CdcClient/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/StdDiag/generic/src
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/StdDiag/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/StdDiag/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/SysTime/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/SysTime/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/SnapS/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/SnapS/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Darh/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Darh/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Rmh/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Adt/generic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Adt/classic/include
+    - ../../bmw_bac_sip/ThirdParty/BAC25/Supply/core/Vin/classic/include
+
+build_list:
+  makefile: software/source/100554.mak
+  variables: [CSRC_FLEX, CSRC_BSW, ASRC]
+  base_dir: software/source
+  # make adds the directory of every compiled source to the include path (SPATH)
+  add_source_dirs_to_includes: true
+
+# Signal pool: generated accessor macros in signals.h; a use is a read/write of the signal, not of signals.h.
+signal_pool:
+  header: software/source/flex/system/signals.h
+  accessors:
+    - {macro: "SP_Set_{signal}_Errorflag", access: error_write}
+    - {macro: "SP_Test_{signal}_Errorflag", access: error_read}
+    - {macro: "SP_Get_{signal}", access: read}
+    - {macro: "SP_Set_{signal}", access: write}
+    - {macro: "SP_SetDefault_{signal}", access: write}
+    - {macro: "SP_Test_{signal}", access: test}
+
+# Design model (Enterprise Architect .qea at the repository root, read-only). The component root tells the
+# App components apart from same-named SCU/FBL components.
+design:
+  model: 100554_BMW_DCDC_GEN3.qea
+  component_root: DCDC_Shared_Model/Component/MCU/Flex/APPL
+  signal_packages: [Signals]
+
+modules:
+  # Proposed from code (INFERENCE); confirm or correct.
+  prefix_aliases:
+    DCDC_Safety_Functions: [DCDC_SF_]
+    Error_Check: [EC_]
+  # Exported symbols called from outside the App folder (RTE runnables, BSW callbacks): not dead exports.
+  # Proposed from code (INFERENCE); confirm or correct.
+  export_exempt: ["*_Init", "*_Main", "*_Main_*", "BswM_Cbk_*", "*_DiagnosticEventTrigger_*"]
+
+# Layers (scan, LAYER-001): not configured. A proposal to confirm, based on the folder structure:
+# layers:
+#   assign:
+#     swc: ["software/source/flex/appl/swc/*"]
+#     appl: ["software/source/flex/appl/*.c", "software/source/flex/appl/*.h"]
+#     driver: ["software/source/flex/driver/*"]
+#     system: ["software/source/flex/system/*"]
+#   allow:
+#     swc: [system]
+#     appl: [swc, driver, system]
+
+rules:
+  # Proposed thresholds, to be calibrated on measured distributions.
+  complexity: {ccn_max: 15, nesting_max: 5, nloc_max: 150, params_max: 6}
+
+gate:
+  min_parse_coverage: 0.95
