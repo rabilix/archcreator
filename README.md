@@ -1,5 +1,10 @@
 # archrev (MVP)
 
+How to work with it, step by step: [docs/MANUAL.md](docs/MANUAL.md) (also as one
+self-contained page, [docs/MANUAL.html](docs/MANUAL.html), rendered by
+`python packaging/render_manual.py` after `pip install -e .[docs]`). This README
+is the reference.
+
 Deterministic architecture analysis of one C module. Given a repository and a
 module name (the C file name without `.c`), archrev parses the App folder with
 libclang and writes an as-built model of the module, rule findings and a review

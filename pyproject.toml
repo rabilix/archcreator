@@ -16,6 +16,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest==8.3.4"]
 build = ["pyinstaller==6.16.0"]
+docs = ["markdown==3.7"]
 
 [project.scripts]
 archrev = "archrev.cli:main"
