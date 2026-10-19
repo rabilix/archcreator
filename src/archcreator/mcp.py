@@ -280,9 +280,23 @@ class Server:
         return "archcreator mcp result folder: " + "/".join(parts)
 
     def _marked(self, marker: Path, parts: tuple[str, ...]) -> bool:
-        """The marker of exactly this result folder (a copied or planted marker of another folder does not count)."""
+        """The marker of exactly this result folder (a copied or planted marker of another folder does not count).
+
+        A spelling that differs only in case counts when both spellings are the same folder on disk (Windows: `alpha`
+        written, `Alpha` asked); where the file system tells case apart they are two folders, and one folder's marker
+        never stands for the other.
+        """
         try:
-            return marker.is_file() and not marker.is_symlink() and                 marker.read_text(encoding="ascii") == self._marker_text(parts)
+            if not marker.is_file() or marker.is_symlink():
+                return False
+            text, expected = marker.read_text(encoding="ascii"), self._marker_text(parts)
+            if text == expected:
+                return True
+            prefix = self._marker_text(())
+            if text.casefold() != expected.casefold() or not text.startswith(prefix):
+                return False
+            written = self.out_root.joinpath(*text[len(prefix):].split("/"))
+            return os.path.samefile(written, self.out_root.joinpath(*parts))
         except (OSError, ValueError):
             return False
 
@@ -459,5 +473,13 @@ def run_stdio(repo: Path, out_root: Path, profile: str | None, profiles_dirs: li
               scopes: list[str] | None = None) -> int:
     server = Server(repo.absolute(), out_root.absolute(), profile, profiles_dirs, scopes)
     print(f"archcreator mcp: serving {server.repo}, results under {server.out_root}", file=sys.stderr)
-    serve(server, sys.stdin.buffer, sys.stdout.buffer)
+    # The protocol gets its own copy of stdout; file descriptor 1 then points at stderr, so that nothing written
+    # below Python (libclang, a C extension) can ever land in the protocol stream.
+    sys.stdout.flush()
+    protocol = os.fdopen(os.dup(sys.stdout.fileno()), "wb", buffering=0)
+    os.dup2(sys.stderr.fileno(), sys.stdout.fileno())
+    try:
+        serve(server, sys.stdin.buffer, protocol)
+    finally:
+        protocol.close()
     return 0

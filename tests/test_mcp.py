@@ -385,3 +385,49 @@ def test_json_constants_that_are_not_json_are_a_parse_error(server):
     sink = io.BytesIO()
     serve(server, io.BytesIO(b'{"jsonrpc":"2.0","id":1,"method":"ping","params":{"x":NaN}}\n'), sink)
     assert json.loads(sink.getvalue())["error"]["code"] == -32700
+
+
+def test_native_writes_to_stdout_never_reach_the_protocol_stream(tmp_path):
+    script = (
+        "import os, sys\n"
+        "from pathlib import Path\n"
+        "from archcreator import mcp\n"
+        "def noisy(self, args):\n"
+        "    os.write(1, b'NATIVE NOISE ')" + chr(10) +    # what a C library writing to stdout would do
+        "    print('PYTHON NOISE')\n"
+        "    return mcp._text_result({'ok': True})\n"
+        "mcp.Server._tool_list_modules = noisy\n"
+        f"mcp.run_stdio(Path({str(FIXTURE)!r}), Path({str(tmp_path / 'out')!r}), {PROFILE!r}, None)\n")
+    requests = [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18"}},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "archcreator_list_modules"}},
+    ]
+    proc = subprocess.run([sys.executable, "-c", script], capture_output=True, timeout=60,
+                          input="".join(json.dumps(r) + "\n" for r in requests).encode("utf-8"))
+    assert proc.returncode == 0, proc.stderr
+    assert [json.loads(line)["id"] for line in proc.stdout.decode("utf-8").splitlines()] == [1, 2]
+    assert b"NATIVE NOISE" in proc.stderr and b"PYTHON NOISE" in proc.stderr
+
+
+def test_a_rerun_with_the_module_spelled_in_other_case_reuses_the_folder(server, tmp_path):
+    assert _call(server, "archcreator_analyze", {"module": "alpha"})["isError"] is False
+    again = _call(server, "archcreator_analyze", {"module": "ALPHA"})
+    assert "not an archcreator result folder" not in json.dumps(_payload(again))
+    # A marker of another module still does not count, whatever its case.
+    other = tmp_path / "out" / "modules" / "gamma"
+    other.mkdir(parents=True)
+    (other / mcp.OUTPUT_MARKER).write_text("ARCHCREATOR MCP RESULT FOLDER: MODULES/BETA", encoding="ascii")
+    (other / "mine.txt").write_text("x", encoding="utf-8")
+    assert "not an archcreator result folder" in _payload(_call(server, "archcreator_analyze", {"module": "gamma"}))["error"]
+
+
+def test_where_case_tells_folders_apart_another_spellings_marker_does_not_count(server, tmp_path, monkeypatch):
+    # On a case-sensitive file system modules/ALPHA and modules/alpha are two folders; samefile says so.
+    folder = tmp_path / "out" / "modules" / "ALPHA"
+    folder.mkdir(parents=True)
+    (folder / mcp.OUTPUT_MARKER).write_text("archcreator mcp result folder: modules/alpha", encoding="ascii")
+    (folder / "mine.txt").write_text("x", encoding="utf-8")
+    monkeypatch.setattr(mcp.os.path, "samefile", lambda a, b: False)
+    result = _call(server, "archcreator_analyze", {"module": "ALPHA"})
+    assert "not an archcreator result folder" in _payload(result)["error"]
+    assert (folder / "mine.txt").is_file()
