@@ -232,11 +232,11 @@ findings of `findings.json`, no others.
 
 | Step | Repo | Content |
 |---|---|---|
-| 1 | arch-governance | `summary.json`, `--json` flags, tests |
+| 1 | archrev | `summary.json`, `--json` flags, tests |
 | 2 | copcli | plugin, method, tests, MANUAL/install docs (Codex review per that repo's rules) |
 | 3 | both | manual end-to-end on fx01 and 100554 |
-| 4 | arch-governance | EA export: `analyze --xmi` / `export-xmi`, XMI 2.1 for EA 16 (implemented 2026-10-18; first import into EA still to verify) |
-| 5 | arch-governance | Done 2026-10-18 (see `archrev_review_2026-10-18.md` section 8): baseline of accepted findings, signal-pool adapter, design comparison straight from the `.qea` (DESIGN findings in the ordinary findings, so `/archrev` explains them like any other), `archrev scan` |
+| 4 | archrev | EA export: `analyze --xmi` / `export-xmi`, XMI 2.1 for EA 16 (implemented 2026-10-18; first import into EA still to verify) |
+| 5 | archrev | Done 2026-10-18 (see `archrev_review_2026-10-18.md` section 8): baseline of accepted findings, signal-pool adapter, design comparison straight from the `.qea` (DESIGN findings in the ordinary findings, so `/archrev` explains them like any other), `archrev scan` |
 | 6 | copcli | `archrev_scan` tool and `/archrev scan` for the repository view (graph, cycles, layers); not started |
 | 7 | copcli | Done 2026-10-18: `archrev_analyze` takes `context` (module names or `["all"]`, passed as `--context`), validates the names before anything runs, and tells the model which modules the run parsed; the method says to start without context and re-run with the modules in question for "who calls / who produces" questions, never presenting a partial run's "no caller" as a fact |
 
