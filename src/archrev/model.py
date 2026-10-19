@@ -87,6 +87,9 @@ def build_model(ir: dict, target_id: str, index: ModuleIndex, scope_label: str, 
         others = [f for f in decl_files if index.module_of_file(f) != site_module]
         if others:
             return index.module_of_file(others[0])
+        if ref["kind"] == "macro_use":
+            # A macro's declaration is its definition: one defined in the using source is the module's own.
+            return index.module_of_file(ref["decl_file"])
         if ref["decl_file"] in app_decl_files.get(ref["usr"], ()) or ref["decl_file"] == ref["site_file"]:
             return f"{UNKNOWN_PREFIX}{ref['name']}"
         return index.module_of_file(ref["decl_file"])

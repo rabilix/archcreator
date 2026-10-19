@@ -163,3 +163,91 @@ def test_macro_provenance_is_per_expansion_not_per_name(tmp_path):
     finding = next(f for f in _json(out / "findings.json")["findings"]
                    if f["rule_id"] == "INTERFACE-001" and f["symbol"] == "beta_hidden")
     assert any(ev["via_macro"] == "DUP_CALL" for ev in finding["evidence"]), "the expansion is a bypass, not mediated"
+
+
+def test_parse_gate_message_names_first_error_and_missing_include_folders(tmp_path):
+    repo = _copy_fixture(tmp_path)
+    beta = repo / "src" / "App" / "beta.c"
+    beta.write_text('#include "generated_nowhere.h"\n' + beta.read_text(encoding="utf-8"), encoding="utf-8")
+    profile = repo / "profile.yaml"
+    profile.write_text(profile.read_text(encoding="utf-8").replace("include_dirs: [App, lib]",
+                                                                   "include_dirs: [App, lib, flex/global]"),
+                       encoding="utf-8")
+    out = tmp_path / "out"
+    assert _analyze(out, profile, repo=repo) == EXIT_PARSE_GATE
+    error = _json(out / "summary.json")["error"]
+    assert "generated_nowhere.h' file not found" in error and "flex/global" in error
+
+
+def test_include_folder_listed_twice_is_passed_once_and_repo_path_is_as_given(tmp_path):
+    repo = _copy_fixture(tmp_path)
+    profile = repo / "profile.yaml"
+    profile.write_text(profile.read_text(encoding="utf-8").replace("include_dirs: [App, lib]",
+                                                                   "include_dirs: [App, lib, App, ./lib]"),
+                       encoding="utf-8")
+    out = tmp_path / "out"
+    assert _analyze(out, profile, repo=repo) == EXIT_OK
+    run_log = _json(out / "run_log.json")
+    args = run_log["compile_args"]
+    folders = [args[i + 1] for i, a in enumerate(args) if a == "-I"]
+    assert len(folders) == len({f.lower() for f in folders})
+    assert run_log["repo"] == str(repo.absolute())
+
+
+def test_macro_defined_in_the_using_source_is_not_a_dependency(tmp_path):
+    repo = _copy_fixture(tmp_path)
+    beta = repo / "src" / "App" / "beta.c"
+    beta.write_text("#define BETA_LIMIT 5\nint beta_limit_user(void) { return BETA_LIMIT; }\n"
+                    + beta.read_text(encoding="utf-8"), encoding="utf-8")
+    out = tmp_path / "out"
+    assert _analyze(out, repo / "profile.yaml", module="beta", repo=repo) == EXIT_OK
+    targets = [e["to"] for e in _json(out / "model.json")["dependencies"]["outgoing"]]
+    assert not any("BETA_LIMIT" in t for t in targets)
+
+
+def test_gate_message_keeps_absolute_folders_out_and_args_includes_count_for_dedup(tmp_path):
+    repo = _copy_fixture(tmp_path)
+    beta = repo / "src" / "App" / "beta.c"
+    beta.write_text('#include "generated_nowhere.h"\n' + beta.read_text(encoding="utf-8"), encoding="utf-8")
+    profile = repo / "profile.yaml"
+    absent = (tmp_path / "no_such_sdk" / "include").as_posix()
+    text = profile.read_text(encoding="utf-8").replace("include_dirs: [App, lib]", f"include_dirs: [App, lib, {absent}]")
+    profile.write_text(text, encoding="utf-8")
+    out = tmp_path / "out"
+    assert _analyze(out, profile, repo=repo) == EXIT_PARSE_GATE
+    error = _json(out / "summary.json")["error"]
+    assert "no_such_sdk" not in error and "1 absolute folder(s)" in error
+
+    from archrev.pipeline import _compile_args
+    prof = load_profile(profile)
+    prof.args.extend(["-I", str(repo / "src" / "lib")])
+    args = _compile_args(repo, prof, [], {})
+    folders = [args[i + 1] for i, a in enumerate(args) if a == "-I"]
+    assert len({f.lower() for f in folders}) == len(folders)
+
+
+def test_relative_dash_i_in_args_does_not_hide_the_profile_folder_and_messages_hide_absolute_paths(tmp_path):
+    from archrev.pipeline import _compile_args, _first_error
+    repo = _copy_fixture(tmp_path)
+    prof = load_profile(repo / "profile.yaml")
+    prof.args.extend(["-I", "lib", "-Ilib"])
+    args = _compile_args(repo, prof, [], {})
+    assert str((repo / "src" / "lib").resolve()) in args
+
+    msgs = ["software/source/a.c:3: 'F:/private-sdk/gen/x.h' file not found",
+            "a.c:3: '/home/u/sdk/x.h' file not found, see <outside>/inc/y.h"]
+    for msg in msgs:
+        text = _first_error({"units": [{"errors_app": 1, "error_messages": [msg]}]})
+        assert "private-sdk" not in text and "/home/" not in text and "<absolute path>" in text
+    for odd in [r"\\server\share\private x\y.h", "/generated.h", "C:/Program Files/private sdk/z.h",
+                "C:/Users/O'Brien/sdk/z.h"]:
+        text = _first_error({"units": [{"errors_app": 1, "error_messages": [f"a.c:1: '{odd}' file not found"]}]})
+        assert text == "a.c:1: '<absolute path>' file not found.", text
+    spaced = _first_error({"units": [{"errors_app": 1, "error_messages": ["src/App folder/config.h:3: 'generated.h' file not found"]}]})
+    assert spaced == "src/App folder/config.h:3: 'generated.h' file not found."
+    unquoted = _first_error({"units": [{"errors_app": 1, "error_messages": ["a.c:1: #error SDK missing: /generated.h"]}]})
+    assert unquoted == "a.c:1: #error SDK missing: <path>."
+    from archrev.pipeline import _missing_hint
+    hint = _missing_hint(["flex/global", "C:/private-sdk/include", "/private-sdk/include"])
+    assert "flex/global" in hint and "private-sdk" not in hint and "2 absolute folder(s)" in hint
+    assert "software/source/a.c:3" in _first_error({"units": [{"errors_app": 1, "error_messages": [msgs[0]]}]})

@@ -7,7 +7,9 @@ module's view; `scan` writes every named module's view plus the graph and rules 
 """
 
 import json
+import os
 import platform
+import re
 import subprocess
 import time
 from collections import Counter
@@ -54,13 +56,31 @@ def _compile_args(repo: Path, profile, source_dirs: list[Path], log: dict) -> li
     args = list(profile.args)
     args += [f"-D{d}" for d in profile.defines]
     missing = []
+    seen: set[str] = set()
+
+    def folder_key(d: Path) -> str:
+        return os.path.normcase(str(d))
+
+    for i, a in enumerate(args):  # -I folders the profile already passes in compile.args
+        given = args[i + 1] if a == "-I" and i + 1 < len(args) else a[2:] if a.startswith("-I") and len(a) > 2 else None
+        # A relative one is resolved by libclang from the process directory, which is not known here: left alone.
+        if given and Path(given).is_absolute():
+            seen.add(folder_key(Path(given).resolve()))
+
+    def add_include(d: Path) -> None:
+        # A folder listed twice (compile.args, profile and source folders) is searched once, at its first position.
+        key = folder_key(d)
+        if key not in seen:
+            seen.add(key)
+            args.extend(["-I", str(d)])
+
     for d in source_dirs:
-        args += ["-I", str(d)]
+        add_include(d)
     for inc in profile.include_dirs:
         p = (wd / inc)
         if not p.is_dir():
             missing.append(inc)
-        args += ["-I", str(p.resolve())]
+        add_include(p.resolve())
     for sysdir in profile.system_include_dirs:
         p = Path(sysdir)
         p = p if p.is_absolute() else wd / p
@@ -187,7 +207,7 @@ class Prepared:
     coverage: dict
     commit: str
     dirty: bool | None
-    missing_include_dirs: int
+    missing_include_dirs: list[str]
     design_con: object | None = None
     hash_cache: dict[str, str] = field(default_factory=dict)
 
@@ -251,7 +271,43 @@ def _prepare(repo: Path, profile, scope: list[Path], parse: "list[str] | callabl
     return Prepared(mapper, scope_label, sources, headers, in_build, not_in_build, parse_set, unresolved_tokens,
                     file_owner, ir, ModuleIndex(file_owner, set(in_build), sources, set(parse_set)), coverage,
                     commit.strip() if commit else "unknown", bool(status.strip()) if status is not None else None,
-                    len(log["missing_include_dirs"]))
+                    list(log["missing_include_dirs"]))
+
+
+# Absolute paths stay out of canonical outputs; the full message is in report.md and ir.json. The first message keeps
+# its "label:line:" prefix when that label is repo-relative; in the text, a quoted absolute path (greedy to the last
+# quote: a path may contain an apostrophe) and then every remaining token holding a slash is masked.
+_LOCATION = re.compile(r"^([^:/\\][^:]*:\d+(?::\d+)?: )(.*)$", re.S)
+_QUOTED_ABSOLUTE = re.compile(r"""(['"])(?:[A-Za-z]:|[\\/]).*\1""")
+_PATH_TOKEN = re.compile(r"\S*[\\/]\S*")
+
+
+def _first_error(ir: dict) -> str:
+    for u in ir["units"]:
+        if u["errors_app"] and u["error_messages"]:
+            message = u["error_messages"][0]
+            found = _LOCATION.match(message)
+            prefix, text = (found.group(1), found.group(2)) if found else ("", message)
+            text = _PATH_TOKEN.sub("<path>", _QUOTED_ABSOLUTE.sub("'<absolute path>'", text))
+            return prefix + text + "."
+    return "none recorded."
+
+
+def _is_absolute(folder: str) -> bool:
+    """Absolute on any host: a drive letter, a UNC share or a leading slash."""
+    return bool(re.match(r"([A-Za-z]:|[\\/])", folder))
+
+
+def _missing_hint(missing: list[str]) -> str:
+    """Include folders of the profile that are absent on disk: often generated folders not yet created."""
+    if not missing:
+        return ""
+    # Absolute folders (machine-specific toolchain paths) stay out of the canonical outputs: they are only counted.
+    relative = [m for m in missing if not _is_absolute(m)]
+    absolute = len(missing) - len(relative)
+    parts = ([f"{', '.join(relative[:5])}{', ...' if len(relative) > 5 else ''}"] if relative else []) + \
+            ([f"{absolute} absolute folder(s), see missing_include_dirs in run_log.json"] if absolute else [])
+    return f" Include folders of the profile missing on disk: {'; '.join(parts)}."
 
 
 def _scope(repo: Path, profile, scope: list[str] | None) -> list[Path]:
@@ -356,7 +412,7 @@ def _analyze_module(repo: Path, profile, prep: Prepared, module: str, target_lab
         "not_in_build": prep.not_in_build,
         "unresolved_make_tokens": len(prep.unresolved_tokens),
         # The paths themselves are profile text and may be absolute; they stay in run_log.json.
-        "missing_include_dir_count": prep.missing_include_dirs,
+        "missing_include_dir_count": len(prep.missing_include_dirs),
         "parse_coverage": prep.coverage,
         "accounting_ok": model["accounting"]["ok"],
         "finding_counts": dict(sorted(Counter(f["severity"] for f in findings).items())),
@@ -373,7 +429,8 @@ def _analyze_module(repo: Path, profile, prep: Prepared, module: str, target_lab
         bad = [u["file"] for u in prep.ir["units"] if not (u["parsed"] and u["errors_app"] == 0)]
         error = (f"parse coverage {prep.coverage['ratio']:.2%} is below the gate {profile.min_parse_coverage:.2%}: "
                  f"{len(bad)} of {prep.coverage['units']} units have errors in App files "
-                 f"({', '.join(bad[:5])}{', ...' if len(bad) > 5 else ''}). Fix the include paths or defines in "
+                 f"({', '.join(bad[:5])}{', ...' if len(bad) > 5 else ''}). First message: {_first_error(prep.ir)}"
+                 f"{_missing_hint(prep.missing_include_dirs)} Fix the include paths or defines in "
                  "the profile; the messages are under 'Parse results' in report.md.")
     else:
         code = gate_code(findings, fail_on)
@@ -405,7 +462,7 @@ def _finish_log(log: dict, t0: float, code: int) -> None:
 
 
 def _new_log(repo: Path) -> dict:
-    return {"started_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "repo": str(repo.resolve()), "stages": {}}
+    return {"started_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "repo": os.path.abspath(repo), "stages": {}}
 
 
 def run_analysis(repo: Path, module: str, profile, scope: list[str] | None, out_dir: Path,
