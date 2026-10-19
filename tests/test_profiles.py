@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev.cli import main
-from archrev.pipeline import EXIT_USAGE
-from archrev.profile import ProfileError, find_profile, normalize_remote
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_USAGE
+from archcreator.profile import ProfileError, find_profile, normalize_remote
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 # The fixture profile without its name, so each test can set one.
@@ -79,9 +79,9 @@ def test_baseline_next_to_central_profiles_is_not_a_profile(tmp_path):
 
 
 def test_git_calls_ignore_repository_hooks_and_monitors(tmp_path, monkeypatch):
-    """A repository's config may name a command (core.fsmonitor); archrev must never let git run it."""
-    import archrev.pipeline as pipeline
-    import archrev.profile as profile
+    """A repository's config may name a command (core.fsmonitor); archcreator must never let git run it."""
+    import archcreator.pipeline as pipeline
+    import archcreator.profile as profile
     seen = []
 
     def fake_run(cmd, **kwargs):
@@ -133,12 +133,12 @@ def test_explicit_profile_wins(tmp_path):
 def test_env_variable_names_the_central_folder(tmp_path, monkeypatch):
     repo = _repo(tmp_path)
     central = _central(tmp_path, {"ecu.yaml": 'name: "ecu"\nmatch: {repo_names: ["work_copy"]}\n'})
-    monkeypatch.setenv("ARCHREV_PROFILES", str(central))
+    monkeypatch.setenv("ARCHCREATOR_PROFILES", str(central))
     _analyze(repo, tmp_path / "out")
     assert _summary(tmp_path / "out")["profile"]["origin"] == "central"
 
 
 def test_shipped_100554_profile_matches_its_remote():
-    from archrev.profile import load_profile
+    from archcreator.profile import load_profile
     p = load_profile(Path(__file__).parents[1] / "profiles" / "100554.yaml")
     assert normalize_remote(p.match_git_remotes[0]) == "bitbucket.org/bitbucket-flex/100554_mc_appl"

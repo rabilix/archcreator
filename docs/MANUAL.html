@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>archrev manual</title>
+<title>archcreator manual</title>
 <style>
 :root{--bg:#ffffff;--fg:#1c2330;--muted:#5b6678;--line:#d9dee7;--accent:#0b5cad;--code:#f3f5f9;--head:#eef2f8}
 @media (prefers-color-scheme:dark){:root{--bg:#10151d;--fg:#e4e8ef;--muted:#9aa5b8;--line:#2a3342;--accent:#6fb0ff;--code:#1a212d;--head:#18202c}}
@@ -30,18 +30,18 @@ blockquote{margin:1rem 0;padding:.2rem 1rem;border-left:4px solid var(--accent);
 </head>
 <body>
 <div class="wrap">
-<nav aria-label="Contents"><ol><li><a href="#1-what-archrev-is-and-is-not">1. What archrev is, and is not</a></li><li><a href="#2-install">2. Install</a></li><li><a href="#3-first-run">3. First run</a></li><li><a href="#4-reading-the-report">4. Reading the report</a></li><li><a href="#5-widening-the-view-context">5. Widening the view: context</a></li><li><a href="#6-the-whole-repository-scan">6. The whole repository: scan</a></li><li><a href="#7-what-the-findings-mean">7. What the findings mean</a></li><li><a href="#8-accepting-what-stays-the-baseline">8. Accepting what stays: the baseline</a></li><li><a href="#9-the-design-comparison">9. The design comparison</a></li><li><a href="#10-into-enterprise-architect-the-xmi-export">10. Into Enterprise Architect: the XMI export</a></li><li><a href="#11-in-ci">11. In CI</a></li><li><a href="#12-from-copcli-the-arch-rev-agent">12. From copcli: the Arch Rev agent</a></li><li><a href="#13-when-something-is-off">13. When something is off</a></li><li><a href="#14-files-you-may-edit-and-files-you-must-not">14. Files you may edit, and files you must not</a></li></ol></nav>
+<nav aria-label="Contents"><ol><li><a href="#1-what-archcreator-is-and-is-not">1. What archcreator is, and is not</a></li><li><a href="#2-install">2. Install</a></li><li><a href="#3-first-run">3. First run</a></li><li><a href="#4-reading-the-report">4. Reading the report</a></li><li><a href="#5-widening-the-view-context">5. Widening the view: context</a></li><li><a href="#6-the-whole-repository-scan">6. The whole repository: scan</a></li><li><a href="#7-what-the-findings-mean">7. What the findings mean</a></li><li><a href="#8-accepting-what-stays-the-baseline">8. Accepting what stays: the baseline</a></li><li><a href="#9-the-design-comparison">9. The design comparison</a></li><li><a href="#10-into-enterprise-architect-the-xmi-export">10. Into Enterprise Architect: the XMI export</a></li><li><a href="#11-in-ci">11. In CI</a></li><li><a href="#12-from-copcli-the-archcreator-agent">12. From copcli: the ArchCreator agent</a></li><li><a href="#13-as-an-mcp-server">13. As an MCP server</a></li><li><a href="#14-when-something-is-off">14. When something is off</a></li><li><a href="#15-files-you-may-edit-and-files-you-must-not">15. Files you may edit, and files you must not</a></li></ol></nav>
 <main>
-<h1 id="archrev-manual">archrev manual</h1>
-<p>How to use archrev day to day. The README is the reference (every option,
+<h1 id="archcreator-manual">archcreator manual</h1>
+<p>How to use archcreator day to day. The README is the reference (every option,
 every output field); this manual follows the work: install, first run, reading
 the result, widening the view, scanning the repository, accepting what stays,
 gating in CI, comparing with the design, and the copcli agent. Commands are
 written for Windows <code>cmd.exe</code> and the 100554 repository; adapt paths for other
 projects.</p>
 <hr />
-<h2 id="1-what-archrev-is-and-is-not">1. What archrev is, and is not</h2>
-<p>archrev reads C sources with libclang and writes an <strong>as-built model</strong> of a
+<h2 id="1-what-archcreator-is-and-is-not">1. What archcreator is, and is not</h2>
+<p>archcreator reads C sources with libclang and writes an <strong>as-built model</strong> of a
 module: what it exports, what it uses (calls, globals, macros, signals), who
 uses it, how complex its functions are. It checks that model against <strong>rules</strong>
 (naming, complexity, interface bypass, build membership, signal ownership,
@@ -73,40 +73,40 @@ with evidence (<code>file:line</code>) and a stable fingerprint.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>archrev-&lt;v&gt;-win64.zip</code></td>
+<td><code>archcreator-&lt;v&gt;-win64.zip</code></td>
 <td>nothing</td>
-<td>unzip; <code>archrev\archrev.exe</code> is the tool, <code>archrev\profiles\</code> the shipped profiles</td>
+<td>unzip; <code>archcreator\archcreator.exe</code> is the tool, <code>archcreator\profiles\</code> the shipped profiles</td>
 </tr>
 <tr>
-<td><code>archrev-&lt;v&gt;-py3-none-any.whl</code></td>
+<td><code>archcreator-&lt;v&gt;-py3-none-any.whl</code></td>
 <td>Python 3.11+</td>
-<td><code>pip install archrev-&lt;v&gt;-py3-none-any.whl</code></td>
+<td><code>pip install archcreator-&lt;v&gt;-py3-none-any.whl</code></td>
 </tr>
 </tbody>
 </table>
 <p>Then:</p>
-<pre><code class="language-bat">set &quot;ARCHREV_PROFILES=\\server\share\archrev\profiles&quot;   :: central profiles; optional with the zip
-archrev version --json
+<pre><code class="language-bat">set &quot;ARCHCREATOR_PROFILES=\\server\share\archcreator\profiles&quot;   :: central profiles; optional with the zip
+archcreator version --json
 </code></pre>
 <p><code>version --json</code> prints the tool version and the schema versions of its
 outputs; front ends check it.</p>
 <p><strong>Profiles</strong> describe one target repository: include paths, defines, the
 build list, the signal pool, the design model, rule thresholds. They are
-central, not in the project. archrev picks the one whose <code>match</code> names the
-repository (git remote or folder name) from <code>ARCHREV_PROFILES</code>, else from the
+central, not in the project. archcreator picks the one whose <code>match</code> names the
+repository (git remote or folder name) from <code>ARCHCREATOR_PROFILES</code>, else from the
 profiles shipped with it. <code>profiles/100554.yaml</code> matches
 <code>bitbucket-flex/100554_mc_appl</code>. You never need <code>--profile</code> for 100554; it is
 there to override.</p>
 <hr />
 <h2 id="3-first-run">3. First run</h2>
 <p>From anywhere:</p>
-<pre><code class="language-bat">archrev list-modules --repo F:\Projekte\100554_BMW_PCU48\100554_mc_appl
+<pre><code class="language-bat">archcreator list-modules --repo F:\Projekte\100554_BMW_PCU48\100554_mc_appl
 </code></pre>
 <p>lists the scope (<code>software/source/flex</code>, 48 modules) and marks the five that
 are not in the build. Then:</p>
-<pre><code class="language-bat">archrev analyze --repo F:\Projekte\100554_BMW_PCU48\100554_mc_appl --module DCDC_FSM
+<pre><code class="language-bat">archcreator analyze --repo F:\Projekte\100554_BMW_PCU48\100554_mc_appl --module DCDC_FSM
 </code></pre>
-<p>takes about two seconds and prints <code>archrev: wrote archrev-out\DCDC_FSM (exit 0)</code>.
+<p>takes about two seconds and prints <code>archcreator: wrote archcreator-out\DCDC_FSM (exit 0)</code>.
 Pick the output folder with <code>--out</code> if the current directory is not where you
 want it.</p>
 <p>What is in the folder:</p>
@@ -181,7 +181,7 @@ want it.</p>
 <tr>
 <td>4</td>
 <td>accounting check failed</td>
-<td>archrev's own consistency check; report it with <code>run_log.json</code> and <code>ir.json</code></td>
+<td>archcreator's own consistency check; report it with <code>run_log.json</code> and <code>ir.json</code></td>
 </tr>
 <tr>
 <td>5</td>
@@ -218,17 +218,17 @@ want it.</p>
    writers and readers among the analyzed modules.</li>
 <li><strong>Outgoing / incoming dependencies</strong> — per module, per symbol, with the
    count of uses, the macro they went through, and the first location.</li>
-<li><strong>Unresolved calls</strong> — function-pointer calls; archrev does not guess
+<li><strong>Unresolved calls</strong> — function-pointer calls; archcreator does not guess
    their targets.</li>
 <li><strong>Function metrics</strong> — CCN, nesting, NLOC, parameters per function.</li>
-<li><strong>Known blind spots</strong> — what archrev cannot see; read it once.</li>
+<li><strong>Known blind spots</strong> — what archcreator cannot see; read it once.</li>
 </ol>
 <hr />
 <h2 id="5-widening-the-view-context">5. Widening the view: context</h2>
 <p>A run alone knows the module from the inside. To see who calls it and who
 produces its signals, name the other modules:</p>
-<pre><code class="language-bat">archrev analyze --repo ... --module DCDC_FSM --context Error_Check,SEV,HCAN_TxRx
-archrev analyze --repo ... --module DCDC_FSM --context all
+<pre><code class="language-bat">archcreator analyze --repo ... --module DCDC_FSM --context Error_Check,SEV,HCAN_TxRx
+archcreator analyze --repo ... --module DCDC_FSM --context all
 </code></pre>
 <p>Cost: about half a second per module parsed; <code>all</code> is the 43 in-build modules
 of <code>flex/</code>, about 35 s. With context the report's incoming dependencies,
@@ -240,8 +240,8 @@ the using source, with no parsed definition, goes to an <code>unknown:</code> no
 use is still reported.</p>
 <hr />
 <h2 id="6-the-whole-repository-scan">6. The whole repository: scan</h2>
-<pre><code class="language-bat">archrev scan --repo ... --modules DCDC_FSM,Error_Check,SEV --out archrev-out\scan
-archrev scan --repo ... --all --out archrev-out\scan
+<pre><code class="language-bat">archcreator scan --repo ... --modules DCDC_FSM,Error_Check,SEV --out archcreator-out\scan
+archcreator scan --repo ... --all --out archcreator-out\scan
 </code></pre>
 <p>One parse, then one output folder per module (exactly what <code>analyze</code> with the
 same context writes) and, next to them:</p>
@@ -383,8 +383,8 @@ system code. That inventory is what the baseline is for.</p>
 human decision per finding, next to the central profile
 (<code>profiles/100554.baseline.yaml</code>, named by <code>baseline:</code> in the profile).</p>
 <p>Workflow for a review round:</p>
-<pre><code class="language-bat">archrev scan --repo ... --all --out archrev-out\scan
-archrev baseline-draft --in archrev-out\scan\DCDC_FSM --out draft.yaml
+<pre><code class="language-bat">archcreator scan --repo ... --all --out archcreator-out\scan
+archcreator baseline-draft --in archcreator-out\scan\DCDC_FSM --out draft.yaml
 </code></pre>
 <p>The draft lists every finding of that run with <code>reason: TODO</code>,
 <code>approved_by: TODO</code>, <code>date: TODO</code>, and for numeric findings the current value
@@ -401,7 +401,7 @@ accepted:
     date: 2026-10-18
     measured_max: 34
 </code></pre>
-<p>archrev refuses the file while a placeholder is left, a date is not
+<p>archcreator refuses the file while a placeholder is left, a date is not
 <code>YYYY-MM-DD</code>, a fingerprint is malformed or listed twice, or the rule does not
 match the finding. From then on every finding has a <strong>status</strong>:</p>
 <ul>
@@ -441,8 +441,8 @@ file name and SHA-256.</p>
 needs a mapping decision), types, sequences.</p>
 <hr />
 <h2 id="10-into-enterprise-architect-the-xmi-export">10. Into Enterprise Architect: the XMI export</h2>
-<pre><code class="language-bat">archrev analyze --repo ... --module SEV --context all --xmi
-archrev export-xmi --in archrev-out\SEV
+<pre><code class="language-bat">archcreator analyze --repo ... --module SEV --context all --xmi
+archcreator export-xmi --in archcreator-out\SEV
 </code></pre>
 <p>writes <code>model.xmi</code> (XMI 2.1 with EA's extensions, for EA 16): one package
 <code>SEV (as-built)</code> with the component, its provided interfaces, one package per
@@ -452,11 +452,11 @@ with the evidence in their notes, and a component diagram. Import: open a
 File</em>. Re-importing the same module replaces its package; different modules
 never share an element. The design packages are never written to.</p>
 <p>EA's own compare cannot pair as-built with design elements (different GUIDs);
-the comparison lives in archrev (section 9), not in EA.</p>
+the comparison lives in archcreator (section 9), not in EA.</p>
 <hr />
 <h2 id="11-in-ci">11. In CI</h2>
-<p>The gate is archrev's exit code, never a front end:</p>
-<pre><code class="language-bat">archrev scan --repo %WORKSPACE% --all --out archrev-out\scan --fail-on major
+<p>The gate is archcreator's exit code, never a front end:</p>
+<pre><code class="language-bat">archcreator scan --repo %WORKSPACE% --all --out archcreator-out\scan --fail-on major
 </code></pre>
 <ul>
 <li>exit 1 fails the build on a <code>new</code> or <code>regressed</code> finding of at least <code>major</code>;
@@ -466,7 +466,7 @@ the comparison lives in archrev (section 9), not in EA.</p>
   <code>system_include_dirs</code> point at the Wind River installation);</li>
 <li>exit 3 means the sources did not parse; keep the gate
   (<code>gate.min_parse_coverage</code>) honest rather than lowering it;</li>
-<li>archive <code>archrev-out\scan</code> as the build artifact: <code>scan_summary.json</code> for
+<li>archive <code>archcreator-out\scan</code> as the build artifact: <code>scan_summary.json</code> for
   dashboards, <code>scan_report.md</code> for people, the manifests for provenance.</li>
 </ul>
 <p>Runs are reproducible from a manifest: commit, dirty flag, profile hash,
@@ -474,26 +474,106 @@ baseline hash, design hash, analyzer versions, parse coverage, output hashes.
 Canonical files carry no timestamps and no absolute paths; <code>run_log.json</code> does
 and is for diagnosis only.</p>
 <hr />
-<h2 id="12-from-copcli-the-arch-rev-agent">12. From copcli: the Arch Rev agent</h2>
-<p><code>/archrev DCDC_FSM</code> in copcli switches to the Arch Rev agent, which runs
-archrev and explains the result: it quotes findings with their evidence, reads
+<h2 id="12-from-copcli-the-archcreator-agent">12. From copcli: the ArchCreator agent</h2>
+<p><code>/archcreator DCDC_FSM</code> in copcli switches to the ArchCreator agent, which runs
+archcreator and explains the result: it quotes findings with their evidence, reads
 the code there, answers "who uses this?" from <code>model.json</code>, and suggests fixes
 as text. It never creates, re-rates or drops a finding and cannot edit
-sources, profiles, rules or archrev's outputs.</p>
+sources, profiles, rules or archcreator's outputs.</p>
 <ul>
 <li>It starts without context (fast). Ask "who calls it?" or "who writes that
   signal?" and it runs again with the modules in question as context, saying
   which modules the run parsed.</li>
 <li>A profile override named by the agent asks you first; the central profile
   folders are read without asking; anything else outside the project asks.</li>
-<li>archrev must be installed outside the repository (<code>ARCHREV_BIN</code> absolute,
-  or on <code>PATH</code>); an <code>archrev</code> inside the checkout is never run.</li>
+<li>archcreator must be installed outside the repository (<code>ARCHCREATOR_BIN</code> absolute,
+  or on <code>PATH</code>); an <code>archcreator</code> inside the checkout is never run.</li>
 <li>What the agent reads goes to M365 Copilot like any tool result. For a run
-  that sends nothing anywhere, use archrev directly.</li>
+  that sends nothing anywhere, use archcreator directly.</li>
 </ul>
-<p>Details: <code>WINDOWS-CMD.md</code> in copcli, section <em>Architecture review of a C module</em>.</p>
+<p>Details: <code>WINDOWS-CMD.md</code> in copcli (now flexcli), section <em>Architecture review of a C module</em>.</p>
 <hr />
-<h2 id="13-when-something-is-off">13. When something is off</h2>
+<h2 id="13-as-an-mcp-server">13. As an MCP server</h2>
+<p><code>archcreator mcp</code> serves the analysis to any MCP client (Claude Code, flexcli, an
+IDE) over stdin/stdout. There is nothing to install besides archcreator itself:
+the server needs no SDK and makes no network connection.</p>
+<pre><code>archcreator mcp --repo F:/Projekte/100554_BMW_PCU48/100554_mc_appl --out-root F:/work/archcreator-out
+</code></pre>
+<p>The repository, the profile (<code>--profile</code>, else the central profile that matches
+the repository), the scope (<code>--scope</code>) and the output root (<code>--out-root</code>) are
+fixed when the server starts. A model that calls the tools can name only
+modules and a few switches. It cannot pass a path, a profile or a command, and
+it can read back only the fixed result files of modules it has analyzed.</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>archcreator_list_modules</code></td>
+<td>the modules in the scope and whether each is in the build</td>
+</tr>
+<tr>
+<td><code>archcreator_analyze</code></td>
+<td><code>module</code>, optional <code>context</code> (names or <code>"all"</code>), optional <code>xmi</code>; returns the summary</td>
+</tr>
+<tr>
+<td><code>archcreator_scan</code></td>
+<td><code>modules</code> (names) or <code>all: true</code>, optional <code>xmi</code>; returns the scan summary</td>
+</tr>
+<tr>
+<td><code>archcreator_read</code></td>
+<td>one result file (<code>report.md</code>, <code>findings.json</code>, <code>model.json</code>, <code>model.xmi</code>, ...) of an analyzed module, or of the scan when <code>module</code> is omitted</td>
+</tr>
+</tbody>
+</table>
+<p>A run that ends with exit code 2 to 5 comes back as an error result with the
+reason in <code>error</code>; exit code 1 (unaccepted findings) is an ordinary result: read
+<code>exit_code</code> and the finding counts in it. Results are written under
+<code>&lt;out-root&gt;/modules/&lt;module&gt;</code> and <code>&lt;out-root&gt;/scan</code> (a scan's modules in
+<code>&lt;out-root&gt;/scan/&lt;module&gt;</code>), so they stay available as files. Each run starts
+from an empty folder: an earlier result of the same module is deleted first, but
+only a folder that carries archcreator's own marker file (<code>.archcreator-output</code>)
+or is empty, so an <code>--out-root</code> that holds other files is never wiped. Give the
+server a folder of its own.</p>
+<p>Claude Code (<code>.mcp.json</code> in the project, or <code>claude mcp add</code>):</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;archcreator&quot;: {
+      &quot;command&quot;: &quot;F:/Tools/archcreator/archcreator.exe&quot;,
+      &quot;args&quot;: [&quot;mcp&quot;, &quot;--repo&quot;, &quot;F:/Projekte/100554_BMW_PCU48/100554_mc_appl&quot;,
+               &quot;--out-root&quot;, &quot;F:/work/archcreator-out&quot;]
+    }
+  }
+}
+</code></pre>
+<p>flexcli (<code>flexcli.json</code>; its default request timeout is 5 seconds, too short for a
+scan, so set a larger one):</p>
+<pre><code class="language-json">{
+  &quot;mcp&quot;: {
+    &quot;archcreator&quot;: {
+      &quot;type&quot;: &quot;local&quot;,
+      &quot;command&quot;: [&quot;F:/Tools/archcreator/archcreator.exe&quot;, &quot;mcp&quot;,
+                  &quot;--repo&quot;, &quot;F:/Projekte/100554_BMW_PCU48/100554_mc_appl&quot;,
+                  &quot;--out-root&quot;, &quot;F:/work/archcreator-out&quot;],
+      &quot;timeout&quot;: 180000
+    }
+  }
+}
+</code></pre>
+<p>The protection covers what a model can do through the tools. It does not defend
+against another process of the same user that changes the output folder while a
+tool call is running (swapping a folder for a junction, say): such a process can
+do anything to the folder anyway. Keep <code>--out-root</code> somewhere only you write to.</p>
+<p>Everything a tool returns goes to the model behind the client. With M365 Copilot
+that is the same upload as in section 12; for a run that sends nothing anywhere
+use the command line. The server handles one request at a time and does not
+report progress: <code>all: true</code> on a large scope can take a minute.</p>
+<hr />
+<h2 id="14-when-something-is-off">14. When something is off</h2>
 <table>
 <thead>
 <tr>
@@ -512,7 +592,7 @@ sources, profiles, rules or archrev's outputs.</p>
 </tr>
 <tr>
 <td>exit 2, "module names must be unique within the scope"</td>
-<td>two <code>.c</code> files with the same stem in the scope; archrev's smallest unit is one <code>.c</code> plus its headers, so one has to be renamed or excluded</td>
+<td>two <code>.c</code> files with the same stem in the scope; archcreator's smallest unit is one <code>.c</code> plus its headers, so one has to be renamed or excluded</td>
 </tr>
 <tr>
 <td>exit 3 after adding driver or system modules</td>
@@ -540,12 +620,12 @@ sources, profiles, rules or archrev's outputs.</p>
 </tr>
 <tr>
 <td>Windows-1252 characters in reports</td>
-<td>archrev keeps bytes as they are; the sources are not UTF-8, the reports are</td>
+<td>archcreator keeps bytes as they are; the sources are not UTF-8, the reports are</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="14-files-you-may-edit-and-files-you-must-not">14. Files you may edit, and files you must not</h2>
+<h2 id="15-files-you-may-edit-and-files-you-must-not">15. Files you may edit, and files you must not</h2>
 <table>
 <thead>
 <tr>
@@ -556,11 +636,11 @@ sources, profiles, rules or archrev's outputs.</p>
 <tbody>
 <tr>
 <td><code>profiles/&lt;project&gt;.yaml</code> (with a review: it is the rule set)</td>
-<td>anything under an output folder (<code>archrev-out</code>, <code>.copcli/archrev</code>)</td>
+<td>anything under an output folder (<code>archcreator-out</code>, <code>.copcli/archcreator</code>)</td>
 </tr>
 <tr>
 <td><code>profiles/&lt;project&gt;.baseline.yaml</code> (with reason, approver, date)</td>
-<td>the <code>.qea</code> through archrev (it only reads it)</td>
+<td>the <code>.qea</code> through archcreator (it only reads it)</td>
 </tr>
 <tr>
 <td>the sources, to fix a finding</td>

@@ -1,4 +1,4 @@
-"""Design comparison against a synthetic Enterprise Architect .qea (the three tables archrev reads)."""
+"""Design comparison against a synthetic Enterprise Architect .qea (the three tables archcreator reads)."""
 
 import json
 import shutil
@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev.cli import main
-from archrev.design import DesignError, DesignSpec, open_design, read_module
-from archrev.pipeline import EXIT_OK, EXIT_USAGE
+from archcreator.cli import main
+from archcreator.design import DesignError, DesignSpec, open_design, read_module
+from archcreator.pipeline import EXIT_OK, EXIT_USAGE
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx02"
 PROFILE = FIXTURE / "profile.yaml"
@@ -175,7 +175,7 @@ def test_module_missing_in_design_and_the_opt_outs(tmp_path):
     assert _analyze(out, "beta", repo=repo, profile=profile) == EXIT_OK
     findings = _json(out / "findings.json")["findings"]
     assert [(f["rule_id"], f["severity"]) for f in findings if f["rule_id"].startswith("DESIGN")] == [("DESIGN-000", "major")]
-    assert _json(out / "design_compare.json") == {"schema": "archrev.design_compare/1", "module": "beta",
+    assert _json(out / "design_compare.json") == {"schema": "archcreator.design_compare/1", "module": "beta",
                                                   "design_file": "design.qea", "found": False}
     assert _analyze(tmp_path / "skip", "beta", "--no-design", repo=repo, profile=profile) == EXIT_OK
     assert not (tmp_path / "skip" / "design_compare.json").exists()

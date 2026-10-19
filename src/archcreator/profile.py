@@ -317,7 +317,7 @@ def load_profile(path: Path) -> Profile:
 
 # --- Central profiles -------------------------------------------------------------------------------------------
 
-PROFILES_ENV = "ARCHREV_PROFILES"
+PROFILES_ENV = "ARCHCREATOR_PROFILES"
 
 
 def normalize_remote(url: str) -> str:
@@ -331,7 +331,7 @@ def normalize_remote(url: str) -> str:
 
 
 def default_profile_dirs() -> list[Path]:
-    """$ARCHREV_PROFILES (os.pathsep-separated), then profiles/ next to a frozen executable or the source checkout."""
+    """$ARCHCREATOR_PROFILES (os.pathsep-separated), then profiles/ next to a frozen executable or the source checkout."""
     dirs = [Path(d) for d in os.environ.get(PROFILES_ENV, "").split(os.pathsep) if d.strip()]
     if getattr(sys, "frozen", False):
         dirs.append(Path(sys.executable).parent / "profiles")
@@ -342,7 +342,7 @@ def default_profile_dirs() -> list[Path]:
 
 def git_command(repo: Path, *args: str) -> list[str]:
     """A git command line that lets the analyzed repository run nothing: its config may name a file-system
-    monitor command (core.fsmonitor) or hooks, and archrev only reads remotes, HEAD and the dirty state."""
+    monitor command (core.fsmonitor) or hooks, and archcreator only reads remotes, HEAD and the dirty state."""
     return ["git", "-C", str(repo), "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
             "-c", "core.hooksPath=/dev/null", *args]
 

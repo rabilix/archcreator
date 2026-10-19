@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-import archrev.cli as cli
-from archrev.cli import main
-from archrev.pipeline import EXIT_INTERNAL, EXIT_OK, EXIT_PARSE_GATE, EXIT_USAGE
-from archrev.profile import ProfileError, load_profile
+import archcreator.cli as cli
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_INTERNAL, EXIT_OK, EXIT_PARSE_GATE, EXIT_USAGE
+from archcreator.profile import ProfileError, load_profile
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 PROFILE = FIXTURE / "profile.yaml"
@@ -89,7 +89,7 @@ def test_argument_error_replaces_stale_summary(tmp_path, capsys):
 
 
 def test_argument_error_summary_goes_where_argparse_would_have_put_it(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)  # the second call has no usable --out and falls back to ./archrev-out
+    monkeypatch.chdir(tmp_path)  # the second call has no usable --out and falls back to ./archcreator-out
     first, second = tmp_path / "first", tmp_path / "second"
     code = main(["analyze", "--repo", str(FIXTURE), "--module", "alpha", "--profile", str(PROFILE),
                  "--out", str(first), "--out", str(second), "--fail-on", "warning"])
@@ -218,7 +218,7 @@ def test_gate_message_keeps_absolute_folders_out_and_args_includes_count_for_ded
     error = _json(out / "summary.json")["error"]
     assert "no_such_sdk" not in error and "1 absolute folder(s)" in error
 
-    from archrev.pipeline import _compile_args
+    from archcreator.pipeline import _compile_args
     prof = load_profile(profile)
     prof.args.extend(["-I", str(repo / "src" / "lib")])
     args = _compile_args(repo, prof, [], {})
@@ -227,7 +227,7 @@ def test_gate_message_keeps_absolute_folders_out_and_args_includes_count_for_ded
 
 
 def test_relative_dash_i_in_args_does_not_hide_the_profile_folder_and_messages_hide_absolute_paths(tmp_path):
-    from archrev.pipeline import _compile_args, _first_error
+    from archcreator.pipeline import _compile_args, _first_error
     repo = _copy_fixture(tmp_path)
     prof = load_profile(repo / "profile.yaml")
     prof.args.extend(["-I", "lib", "-Ilib"])
@@ -247,7 +247,30 @@ def test_relative_dash_i_in_args_does_not_hide_the_profile_folder_and_messages_h
     assert spaced == "src/App folder/config.h:3: 'generated.h' file not found."
     unquoted = _first_error({"units": [{"errors_app": 1, "error_messages": ["a.c:1: #error SDK missing: /generated.h"]}]})
     assert unquoted == "a.c:1: #error SDK missing: <path>."
-    from archrev.pipeline import _missing_hint
+    from archcreator.pipeline import _missing_hint
     hint = _missing_hint(["flex/global", "C:/private-sdk/include", "/private-sdk/include"])
     assert "flex/global" in hint and "private-sdk" not in hint and "2 absolute folder(s)" in hint
     assert "software/source/a.c:3" in _first_error({"units": [{"errors_app": 1, "error_messages": [msgs[0]]}]})
+
+
+def test_scan_refuses_module_names_that_cannot_be_output_folders(tmp_path):
+    from archcreator.discovery import DiscoveryError
+    from archcreator.pipeline import _check_output_names
+    _check_output_names(["alpha", "Beta_2"])
+    for names, expect in ((["alpha", ".."], "not letters, digits and _ only: .."),
+                          (["a-b"], "a-b"), (["Alpha", "ALPHA"], "differ only in case: Alpha/ALPHA")):
+        with pytest.raises(DiscoveryError, match="cannot be output folders") as info:
+            _check_output_names(names)
+        assert expect in str(info.value)
+
+
+def test_scan_all_with_a_hyphenated_source_name_is_a_usage_error(tmp_path):
+    repo = _copy_fixture(tmp_path)
+    shutil.copy(repo / "src" / "App" / "beta.c", repo / "src" / "App" / "we-ird.c")
+    build = repo / "src" / "build.mk"
+    build.write_text(build.read_text(encoding="utf-8").replace("App/beta.c", "App/beta.c App/we-ird.c"),
+                     encoding="utf-8")
+    out = tmp_path / "out"
+    code = main(["scan", "--repo", str(repo), "--profile", str(repo / "profile.yaml"), "--all", "--out", str(out)])
+    assert code == EXIT_USAGE
+    assert "we-ird" in _json(out / "scan_summary.json")["error"]

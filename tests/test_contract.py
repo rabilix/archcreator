@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev import __version__
-from archrev.cli import main
-from archrev.pipeline import EXIT_USAGE, TOP_FINDINGS, build_summary
+from archcreator import __version__
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_USAGE, TOP_FINDINGS, build_summary
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 PROFILE = str(FIXTURE / "profile.yaml")
@@ -26,7 +26,7 @@ def test_summary_matches_findings(tmp_path):
     assert _analyze(tmp_path) == 0
     s = _summary(tmp_path)
     findings = json.loads((tmp_path / "findings.json").read_text(encoding="utf-8"))["findings"]
-    assert s["schema"] == "archrev.summary/1"
+    assert s["schema"] == "archcreator.summary/1"
     assert s["module"] == "alpha" and s["exit_code"] == 0 and s["error"] is None
     assert s["finding_counts"] == {
         "by_rule": {"BUILD-001": 1, "COMPLEXITY-001": 2, "INTERFACE-001": 2, "NAMING-001": 1},
@@ -79,14 +79,14 @@ def test_usage_error_writes_error_summary(tmp_path):
 def test_invalid_module_name_rejected_without_writing_outside(tmp_path, monkeypatch, bad):
     monkeypatch.chdir(tmp_path)
     assert main(["analyze", "--repo", str(FIXTURE), "--module", bad, "--profile", PROFILE]) == EXIT_USAGE
-    assert not (tmp_path / "archrev-out").exists()
+    assert not (tmp_path / "archcreator-out").exists()
     assert not (tmp_path / "x").exists()
 
 
 def test_list_modules_json(capsys):
     assert main(["list-modules", "--repo", str(FIXTURE), "--profile", PROFILE, "--json"]) == 0
     data = json.loads(capsys.readouterr().out)
-    assert data == {"schema": "archrev.modules/1", "scopes": [{"scope": "src/App", "modules": [
+    assert data == {"schema": "archcreator.modules/1", "scopes": [{"scope": "src/App", "modules": [
         {"name": "alpha", "file": "src/App/alpha.c", "in_build": True},
         {"name": "beta", "file": "src/App/beta.c", "in_build": True},
         {"name": "unused_mod", "file": "src/App/unused_mod.c", "in_build": False},
@@ -96,7 +96,7 @@ def test_list_modules_json(capsys):
 def test_version_json(capsys):
     assert main(["version", "--json"]) == 0
     assert json.loads(capsys.readouterr().out) == {
-        "tool": "archrev", "version": __version__,
-        "schemas": {"summary": "archrev.summary/1", "modules": "archrev.modules/1",
-                    "scan_summary": "archrev.scan_summary/1", "graph": "archrev.graph/1"},
+        "tool": "archcreator", "version": __version__,
+        "schemas": {"summary": "archcreator.summary/1", "modules": "archcreator.modules/1",
+                    "scan_summary": "archcreator.scan_summary/1", "graph": "archcreator.graph/1"},
         "xmi_target": "ea16"}

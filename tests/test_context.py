@@ -4,9 +4,9 @@ import json
 import shutil
 from pathlib import Path
 
-from archrev.cli import main
-from archrev.discovery import resolve_module
-from archrev.pipeline import EXIT_OK, EXIT_USAGE
+from archcreator.cli import main
+from archcreator.discovery import resolve_module
+from archcreator.pipeline import EXIT_OK, EXIT_USAGE
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 PROFILE = FIXTURE / "profile.yaml"

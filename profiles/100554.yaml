@@ -6,14 +6,14 @@
 #   build_list    = CSRC_FLEX + CSRC_BSW + ASRC in 100554.mak
 profile_version: 1
 name: "100554-release"
-# Repositories this central profile applies to (archrev picks it when --profile is not given).
+# Repositories this central profile applies to (archcreator picks it when --profile is not given).
 match:
   git_remotes: ["git@bitbucket.org:bitbucket-flex/100554_mc_appl.git"]
   repo_names: ["100554_mc_appl"]
 # Folders whose .c files are modules; /flex is the start, delivered applications are added here as further entries.
 scope:
   - software/source/flex
-# Accepted findings (human decisions); empty until the first review round. Draft: archrev baseline-draft.
+# Accepted findings (human decisions); empty until the first review round. Draft: archcreator baseline-draft.
 baseline: 100554.baseline.yaml
 
 compile:

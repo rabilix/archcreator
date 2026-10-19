@@ -19,7 +19,7 @@ from .profile import PROFILES_ENV, Profile, ProfileError, default_profile_dirs, 
 from .rules import SEVERITY_ORDER
 from .xmi import XMI_TARGET
 
-_MODULE_NAME = re.compile(r"^[A-Za-z0-9_]+$")
+_MODULE_NAME = re.compile(r"[A-Za-z0-9_]+")
 
 
 def _profile(args, repo: Path) -> Profile:
@@ -41,13 +41,13 @@ def _out_dir(args) -> Path | None:
     if args.out:
         return Path(args.out)
     if args.command == "scan":
-        return Path("archrev-out") / "scan"
+        return Path("archcreator-out") / "scan"
     # The default folder is derived from the module name; never from a name that could leave it.
-    return Path("archrev-out") / args.module if _MODULE_NAME.match(args.module) else None
+    return Path("archcreator-out") / args.module if _MODULE_NAME.fullmatch(args.module) else None
 
 
 def version_info() -> dict:
-    return {"tool": "archrev", "version": __version__,
+    return {"tool": "archcreator", "version": __version__,
             "schemas": {"summary": SUMMARY_SCHEMA, "modules": MODULES_SCHEMA, "scan_summary": SCAN_SUMMARY_SCHEMA,
                         "graph": GRAPH_SCHEMA},
             "xmi_target": XMI_TARGET}
@@ -78,7 +78,7 @@ def _argv_option(argv: list[str], name: str) -> str | None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = _Parser(prog="archrev", description="Deterministic architecture analysis of one C module.")
+    parser = _Parser(prog="archcreator", description="Deterministic architecture analysis of one C module.")
     sub = parser.add_subparsers(dest="command", required=True)
 
     def run_args(sub_parser, out_help: str) -> None:
@@ -103,14 +103,14 @@ def _parser() -> argparse.ArgumentParser:
     a.add_argument("--module", required=True, help="module name = C file name without .c (e.g. DCDC_FSM)")
     a.add_argument("--context", help="comma-separated in-build modules to parse alongside, or 'all': callers, "
                                      "signal producers and consumers are known among these only (default: none)")
-    run_args(a, "output directory (default: archrev-out/<module>)")
+    run_args(a, "output directory (default: archcreator-out/<module>)")
 
     s = sub.add_parser("scan", help="analyze the named modules from one parse, plus the module graph and the "
                                     "rules over them (cycles, layers, unused exports)")
     group = s.add_mutually_exclusive_group(required=True)
     group.add_argument("--modules", help="comma-separated in-build module names to analyze")
     group.add_argument("--all", action="store_true", help="every in-build module of the scope")
-    run_args(s, "output directory (default: archrev-out/scan; one folder per module inside)")
+    run_args(s, "output directory (default: archcreator-out/scan; one folder per module inside)")
 
     x = sub.add_parser("export-xmi", help="write the XMI 2.1 for Enterprise Architect 16 of an analyze output folder")
     x.add_argument("--in", dest="in_dir", required=True, help="output folder of analyze (model.json, manifest.json)")
@@ -125,7 +125,14 @@ def _parser() -> argparse.ArgumentParser:
     lm.add_argument("--repo", required=True)
     _profile_args(lm)
     lm.add_argument("--scope", action="append")
-    lm.add_argument("--json", action="store_true", help="print JSON (schema archrev.modules/1)")
+    lm.add_argument("--json", action="store_true", help="print JSON (schema archcreator.modules/1)")
+
+    m = sub.add_parser("mcp", help="serve the analysis as an MCP server on stdin/stdout (for MCP clients)")
+    m.add_argument("--repo", required=True, help="root of the target repository (fixed for the whole session)")
+    _profile_args(m)
+    m.add_argument("--scope", action="append", help="folder whose .c files are modules; repeatable (default: profile)")
+    m.add_argument("--out-root", default="archcreator-out",
+                   help="folder for the results, one subfolder per module (default: ./archcreator-out)")
 
     v = sub.add_parser("version", help="print the tool version and output schema versions")
     v.add_argument("--json", action="store_true")
@@ -135,27 +142,31 @@ def _parser() -> argparse.ArgumentParser:
 def _run(args) -> int:
     if args.command == "version":
         info = version_info()
-        print(dumps(info), end="") if args.json else print(f"archrev {info['version']}")
+        print(dumps(info), end="") if args.json else print(f"archcreator {info['version']}")
         return 0
     if args.command == "export-xmi":
-        print(f"archrev: wrote {export_xmi(Path(args.in_dir), Path(args.out) if args.out else None)}")
+        print(f"archcreator: wrote {export_xmi(Path(args.in_dir), Path(args.out) if args.out else None)}")
         return 0
     if args.command == "baseline-draft":
         findings_file = Path(args.in_dir) / "findings.json"
         try:
             findings = json.loads(findings_file.read_text(encoding="utf-8"))["findings"]
         except FileNotFoundError:
-            raise DiscoveryError(f"not an archrev output folder (run analyze first): {findings_file}") from None
+            raise DiscoveryError(f"not an archcreator output folder (run analyze first): {findings_file}") from None
         text = draft(findings)
         if args.out:
             write_text(Path(args.out), text)
-            print(f"archrev: wrote {args.out} ({len(findings)} entries to fill in)")
+            print(f"archcreator: wrote {args.out} ({len(findings)} entries to fill in)")
         else:
             print(text, end="")
         return 0
     repo = Path(args.repo)
     if not repo.is_dir():
         raise DiscoveryError(f"repo does not exist: {repo}")
+    if args.command == "mcp":
+        from .mcp import run_stdio
+        _profile(args, repo)  # a broken profile stops the server at start, not at the first tool call
+        return run_stdio(repo, Path(args.out_root), args.profile, args.profiles_dir, args.scope)
     profile = _profile(args, repo)
     if args.command == "list-modules":
         if args.json:
@@ -170,14 +181,14 @@ def _run(args) -> int:
         modules = _names(args.modules, "--modules") if args.modules is not None else ["all"]
         code = run_scan(repo, profile, args.scope, out, args.fail_on, xmi=args.xmi, baseline=baseline,
                         design=design, design_path=design_path, modules=modules)
-        print(f"archrev: wrote {out} (exit {code})")
+        print(f"archcreator: wrote {out} (exit {code})")
         return code
     if out is None:
         raise DiscoveryError(f"invalid module name: {args.module!r} (letters, digits and _ only)")
     context = _names(args.context, "--context") if args.context is not None else None
     code = run_analysis(repo, args.module, profile, args.scope, out, args.fail_on, xmi=args.xmi, baseline=baseline,
                         design=design, design_path=design_path, context=context)
-    print(f"archrev: wrote {out} (exit {code})")
+    print(f"archcreator: wrote {out} (exit {code})")
     return code
 
 
@@ -186,7 +197,7 @@ def _names(text: str, option: str) -> list[str]:
     names = [m.strip() for m in text.split(",") if m.strip()]
     if names == ["all"]:
         return names
-    bad = [m for m in names if not _MODULE_NAME.match(m) or m == "all"]
+    bad = [m for m in names if not _MODULE_NAME.fullmatch(m) or m == "all"]
     if bad or not names:
         raise DiscoveryError(f"{option}: invalid module name(s): {', '.join(bad) or '(empty)'} "
                              "(letters, digits and _ only; 'all' stands alone)")
@@ -210,7 +221,7 @@ def _baseline(args, profile: Profile) -> Baseline | None:
 
 
 def _fail(args, code: int, message: str, label: str = "error") -> int:
-    print(f"archrev: {label}: {message}", file=sys.stderr)
+    print(f"archcreator: {label}: {message}", file=sys.stderr)
     # Front ends read the exit code and the error from the summary; write it whenever an output folder is known.
     if args.command in ("analyze", "scan") and (out := _out_dir(args)) is not None:
         name = "scan_summary.json" if args.command == "scan" else "summary.json"
@@ -222,7 +233,7 @@ def _fail(args, code: int, message: str, label: str = "error") -> int:
             out.mkdir(parents=True, exist_ok=True)
             write_json(out / name, summary)
         except OSError as exc:
-            print(f"archrev: could not write {out / name}: {exc}", file=sys.stderr)
+            print(f"archcreator: could not write {out / name}: {exc}", file=sys.stderr)
     return code
 
 

@@ -69,7 +69,7 @@ pre.tree { margin:0; font:0.82rem/1.5 ui-monospace,Consolas,monospace; white-spa
 <body>
 <main>
 <h1>UML vs code: four App modules</h1>
-<p class="lede">BMW PCU48 (100554). Compares how <strong>DCDC_FSM</strong>, <strong>DCDC_Safety_Functions</strong>, <strong>Error_Check</strong> and <strong>SEV</strong> are described in the Enterprise Architect model <code>100554_BMW_DCDC_GEN3.qea</code> and in the C code (commit <code>39db4e93a</code>, analyzed with archrev 0.1.0). Read-only: nothing was written back to the model.</p>
+<p class="lede">BMW PCU48 (100554). Compares how <strong>DCDC_FSM</strong>, <strong>DCDC_Safety_Functions</strong>, <strong>Error_Check</strong> and <strong>SEV</strong> are described in the Enterprise Architect model <code>100554_BMW_DCDC_GEN3.qea</code> and in the C code (commit <code>39db4e93a</code>, analyzed with archcreator 0.1.0). Read-only: nothing was written back to the model.</p>
 
 <section class="panel">
   <h2>How each side describes a module</h2>
@@ -101,7 +101,7 @@ software/source/generated/Rte_&lt;Module&gt;*.h
       <ul>
         <li><strong>Provided</strong> = functions and globals with external linkage. Runnables (<code>*_Main*</code>, <code>*_Init</code>) are called by the RTE/OS, not by App code.</li>
         <li><strong>Required</strong> = everything the module calls, reads or writes outside itself: signal pool (<code>SP_*</code>), RTE ports, other SWCs, parameters (<code>PAR_*</code> in <code>cds_data</code>), drivers, BSW.</li>
-        <li>Extracted deterministically by archrev (libclang). Each dependency carries file:line evidence.</li>
+        <li>Extracted deterministically by archcreator (libclang). Each dependency carries file:line evidence.</li>
       </ul>
     </div>
   </div>
@@ -334,7 +334,7 @@ software/source/generated/Rte_&lt;Module&gt;*.h
   <h2>Method and limits</h2>
   <ul>
     <li>UML facts were read with SQL from the <code>.qea</code> (SQLite) tables <code>t_object</code>, <code>t_operation</code>, <code>t_operationparams</code>, <code>t_attribute</code>, <code>t_diagramobjects</code> and <code>t_package</code>. Only the <code>DCDC_Shared_Model/Component/MCU/Flex/APPL</code> component is compared. Playground copies are ignored.</li>
-    <li>Code facts come from <code>archrev analyze</code> outputs (<code>model.json</code>) for the release profile. Code disabled by the active defines is not seen.</li>
+    <li>Code facts come from <code>archcreator analyze</code> outputs (<code>model.json</code>) for the release profile. Code disabled by the active defines is not seen.</li>
     <li>Matching is by exact name, plus <code>SP_*_&lt;signal&gt;</code> accessors for signal interfaces. A signal reached through generic accessors such as <code>SP_Get_Signal_Word(SignalID_x)</code>, or a DEM event reached through <code>DemConf_*</code> IDs, shows as "not referenced" even though it may be used.</li>
     <li>"Not in code" for type_defs means the type name doesn't appear in the module's own .c/.h files.</li>
     <li>The working tree had uncommitted deletions outside <code>software/</code> (Cantata). They don't affect these modules.</li>

@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev.cli import main
-from archrev.pipeline import EXIT_FINDINGS, EXIT_OK, EXIT_USAGE, run_analysis
-from archrev.profile import ProfileError, load_profile
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_FINDINGS, EXIT_OK, EXIT_USAGE, run_analysis
+from archcreator.profile import ProfileError, load_profile
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 CANONICAL = ("ir.json", "model.json", "findings.json", "report.md", "manifest.json")

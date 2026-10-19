@@ -1,6 +1,6 @@
-# archrev review (2026-10-18)
+# archcreator review (2026-10-18)
 
-Scope: the whole tool as it stands before its first commit: `src/archrev/*`, the
+Scope: the whole tool as it stands before its first commit: `src/archcreator/*`, the
 100554 profile, packaging, tests, the copcli concept and the EA export.
 
 Method:
@@ -63,7 +63,7 @@ genuine finding under the declared rule; keep it.
 
 ## 3. Gaps against the governance goal
 
-These are the differences between what archrev measures and what an
+These are the differences between what archcreator measures and what an
 architecture review of this project needs. Ordered by impact.
 
 ### G1. The signal pool is invisible as module coupling
@@ -71,7 +71,7 @@ architecture review of this project needs. Ordered by impact.
 All three modules show **zero** INTERFACE-001 findings. The reason is not clean
 code: cross-module data flow in 100554 goes through `SP_Get_<signal>`,
 `SP_Set_<signal>`, `SP_Test_<signal>` macros from `flex/system/signals.h`
-(outside the App folder). archrev attributes those uses to the external module
+(outside the App folder). archcreator attributes those uses to the external module
 `signalpool.h` and treats them as mediated. So:
 
 - The producer/consumer relation between App modules (who sets a signal, who
@@ -79,13 +79,13 @@ code: cross-module data flow in 100554 goes through `SP_Get_<signal>`,
   `software/source/flex` mostly end at `signals.h` / `signalpool.h`.
 - The UML model expresses exactly this relation (RequiredInterface /
   ProvidedInterface per signal under `SYSTEM/Signals`). The one thing the
-  design model is most precise about is the one thing archrev cannot see.
+  design model is most precise about is the one thing archcreator cannot see.
 
 ### G2. No design-model input
 
 The question that started this work, "where does the code deviate from the UML
 model", is answered only by throw-away scripts in the scratchpad
-(`compare.py`, `qea_*.py`). archrev itself has no notion of a design model. The
+(`compare.py`, `qea_*.py`). archcreator itself has no notion of a design model. The
 XMI export goes the other way (code into EA) and, because the as-built
 elements carry their own GUIDs, EA's model comparison cannot pair them with the
 design elements. Comparison in EA is therefore by eye.
@@ -110,7 +110,7 @@ forever. There is no way to record "accepted, reason, approver, date", so:
 - `--fail-on` is unusable as a CI gate on legacy code (it would fail on day 1
   and every day after).
 - The project rule "corrections only in code or rules, with human approval"
-  has no tool support: an approval cannot be written anywhere archrev reads.
+  has no tool support: an approval cannot be written anywhere archcreator reads.
 - No "did it get worse" (ratchet) check, which is the only complexity rule
   that works on legacy code.
 
@@ -141,7 +141,7 @@ who approved that hash. For an ASIL project an approved-rule-set register
 
 ### G9. Schema and compatibility policy
 
-Schemas are `archrev.*/1` with no changelog and no statement of what a `/2`
+Schemas are `archcreator.*/1` with no changelog and no statement of what a `/2`
 would mean for copcli or stored results.
 
 ## 4. Enhancements (proposed, in order)
@@ -149,8 +149,8 @@ would mean for copcli or stored results.
 | # | Enhancement | Addresses | Effort |
 |---|---|---|---|
 | E1 | **Signal-pool adapter.** Profile section `signal_pool: {patterns: ["SP_Get_{signal}", "SP_Set_{signal}", "SP_Test_{signal}_Errorflag", ...], header: flex/system/signals.h}`. Each macro use becomes a `signal_read` / `signal_write` / `signal_test` edge to a `signal:<name>` node; the producer is the module that writes it. New rules: SIGNAL-001 consumed but no producer in build; SIGNAL-002 produced by more than one module; SIGNAL-003 signal declared in UML as required but never read (the 24/102 unused interfaces found by hand in `Error_Check`). | G1, and it is the bridge to the UML signal interfaces | 2-3 days |
-| E2 | **`archrev compare --design <model.qea>`.** Read the EA model read-only through SQLite (the approach already proven in the scratchpad), match by names (component, `«Function»` interfaces, signal interfaces, states), and emit DESIGN-00x findings: in UML not in code, in code not in UML, name mismatches (`DCDC_Safety_Functions_Init` vs `DCDC_SF_Init`), state machine state sets. Deterministic, needs no EA installation, writes nothing to the model. Alternatively accept an EA XMI export as the design input for machines without the `.qea`. | G2 | 3-4 days |
-| E3 | **`archrev scan`: whole-App run.** Parse once, write every module's model plus `graph.json`; rules ARCH-001 (dependency cycles between App modules), LAYER-001 (allowed-dependency matrix in the profile, e.g. `swc -> driver: deny`), EXPORT-001 (exported symbol never used in the build). `analyze` stays as the per-module view. BUILD-001 moves here (fixes D3). | G3, D3 | 2-3 days |
+| E2 | **`archcreator compare --design <model.qea>`.** Read the EA model read-only through SQLite (the approach already proven in the scratchpad), match by names (component, `«Function»` interfaces, signal interfaces, states), and emit DESIGN-00x findings: in UML not in code, in code not in UML, name mismatches (`DCDC_Safety_Functions_Init` vs `DCDC_SF_Init`), state machine state sets. Deterministic, needs no EA installation, writes nothing to the model. Alternatively accept an EA XMI export as the design input for machines without the `.qea`. | G2 | 3-4 days |
+| E3 | **`archcreator scan`: whole-App run.** Parse once, write every module's model plus `graph.json`; rules ARCH-001 (dependency cycles between App modules), LAYER-001 (allowed-dependency matrix in the profile, e.g. `swc -> driver: deny`), EXPORT-001 (exported symbol never used in the build). `analyze` stays as the per-module view. BUILD-001 moves here (fixes D3). | G3, D3 | 2-3 days |
 | E4 | **Baseline file.** `baseline.yaml` next to the central profile: `{fingerprint, rule, reason, approved_by, date}`. Findings get `status: new / accepted / regressed`; `--fail-on` counts `new` only; `summary.json` reports all three counts. Ratchet for COMPLEXITY-001: a function may not exceed its baselined value. | G4, G6 | 1-2 days |
 | E5 | **Exit-code hygiene.** Catch everything in `cli.main`: profile load errors are exit 2, anything unexpected is a new exit 5 (`internal error`) with an error `summary.json`. Validate `min_parse_coverage` (finite, 0..1) and nested profile types. Fill `summary.error` on exits 3 and 4. Move `missing_include_dirs` to `run_log.json`. | D1, D2, D11, D14, D15 | 1 day |
 | E5a | **Stable macro identities and per-expansion provenance.** Normalize macro USRs (drop the offset); resolve `via_macro_file` from the `MACRO_INSTANTIATION` cursor covering the expansion instead of by name; extend the line-shift test to headers. | D12, D13 | 1 day |
@@ -158,7 +158,7 @@ would mean for copcli or stored results.
 | E7 | **NAMING exemptions.** `modules.naming_exempt: ["BswM_Cbk_*", "Rte_*", "*_Callback"]` per profile; exempted symbols are listed in the report, not silently dropped. | D8 | 0.5 day |
 | E8 | **Duplicate-definition check.** Two App definitions of one external symbol are a reported inconsistency (exit 4 class), not a silent pick. | D4 | 0.5 day |
 | E9 | **Include order verification.** Capture the real Diab command line from one `make -n` run and put the `-I` order into the profile as-is; drop `add_source_dirs_to_includes` unless `make -n` proves SPATH is passed as `-I`. | D9 | 0.5 day |
-| E10 | **CI outputs.** `archrev scan --format sarif` and a JUnit variant; a Bitbucket pipeline example in the README. | G7 | 1 day |
+| E10 | **CI outputs.** `archcreator scan --format sarif` and a JUnit variant; a Bitbucket pipeline example in the README. | G7 | 1 day |
 | E11 | **Governance register.** `approved_profiles.yaml` (profile hash, approver, date, note) checked by `analyze`; a profile not in the register is reported as `unapproved` in summary and report. | G8 | 0.5 day |
 | E12 | **IR cache.** Key `(file sha256, compile args, libclang version)` per unit; a second run on an unchanged tree skips the 10 s parse. Determinism is unaffected because the cache stores the same IR the parse would produce. | G3 cost | 1 day |
 | E13 | **Make conditionals.** Evaluate `ifdef/ifndef/ifeq/ifneq` in `read_make_list` against `build_list.defines` from the profile; unresolved conditions are reported like unresolved tokens. | D6 | 1 day |
@@ -173,7 +173,7 @@ E2 (the architecture value), then E3.
 Two passes with Codex CLI 0.161.0 (gpt-5-codex, reasoning effort high):
 `codex review --uncommitted` over the whole repository and `codex exec` in a
 read-only sandbox with targeted questions. Raw output:
-`scratchpad/codex_archrev.txt`, `scratchpad/codex_archrev_exec.txt` (session
+`scratchpad/codex_archcreator.txt`, `scratchpad/codex_archcreator_exec.txt` (session
 scratchpad, not in the repository).
 
 | Codex item | Assessment | Where in this review |
@@ -186,7 +186,7 @@ scratchpad, not in the repository).
 | Gate failures leave `summary.error` null (P2) | Confirmed | D14 |
 | Absolute paths from the profile in the canonical manifest (P2) | Confirmed, minor | D15 |
 | Not-in-build target is parsed anyway (P2) | Confirmed, documentation/consistency | D16 |
-| copcli: `edit .copcli/*` also covers archrev's outputs (concept) | Confirmed and **fixed in the copcli worktree**: `edit .copcli/archrev/*` is now denied after the notes rule (last match wins), with a test; `method.txt` and the concept say so. 21 tests pass, typecheck clean. | section 6 |
+| copcli: `edit .copcli/*` also covers archcreator's outputs (concept) | Confirmed and **fixed in the copcli worktree**: `edit .copcli/archcreator/*` is now denied after the notes rule (last match wins), with a test; `method.txt` and the concept say so. 21 tests pass, typecheck clean. | section 6 |
 
 Codex did not find anything in the dependency model's reference walking,
 ownership or accounting beyond D12; nor in profile matching or Windows path
@@ -197,7 +197,7 @@ verify the EA import.
 
 The permission hole above was the only concept-level gap Codex found and it
 is closed. Everything else on the copcli side is unchanged and still waits for
-the first live `/archrev` session, the Codex review of the branch and the
+the first live `/archcreator` session, the Codex review of the branch and the
 commit.
 
 ## 8. Implementation status (same day, proposals 1-5)
@@ -224,7 +224,7 @@ team's behalf.
 
 Open after step 5:
 
-- First import of `model.xmi` into EA 16 and the first live `/archrev` session
+- First import of `model.xmi` into EA 16 and the first live `/archcreator` session
   are still unverified (no EA, no Copilot session on this machine).
 - State-machine comparison (part of E2) deferred: states sit in differently
   named packages per module; needs a per-module mapping decision.
@@ -233,7 +233,7 @@ Open after step 5:
 - SIGNAL-001 reports signals produced outside the App folder (ADC, drivers) as
   "no App writer" (`info`); a `signal_pool.external_producers` list or a
   driver-folder scan would remove that noise.
-- The copcli plugin still offers `archrev_analyze` only; an `archrev_scan` tool
+- The copcli plugin still offers `archcreator_analyze` only; an `archcreator_scan` tool
   is the natural next step there.
 
 ## 9. Codex review of step 5
@@ -249,7 +249,7 @@ Six points, all confirmed and fixed:
 | Design-model hash cached process-wide | cached per run (`Prepared.hash_cache`) |
 | LAYER-001/ARCH-001 cited an `#include` as evidence | evidence is kept per edge kind; a rule cites the earliest evidence of a kind it counts |
 
-Final state: 121 tests, all passing; wheel and exe rebuilt, `archrev.exe scan`
+Final state: 121 tests, all passing; wheel and exe rebuilt, `archcreator.exe scan`
 byte-identical to the development install; 100554 full scan 13.3 s.
 
 ## 10. Module boundaries and scope (decided after step 5)
@@ -314,9 +314,9 @@ to the development install on a real module with context.
 
 ## 7. Changes made during this review
 
-- `src/archrev/xmi.py`: all export keys include the target module (D17).
+- `src/archcreator/xmi.py`: all export keys include the target module (D17).
 - `tests/test_xmi.py`: `test_exports_of_different_modules_share_no_ids`.
-- copcli worktree `feature/archrev`: `arch-rev.ts` deny rules for
-  `.copcli/archrev/*`, test, `method.txt` wording; concept section 5.3.
+- copcli worktree `feature/archcreator`: `arch-creator.ts` deny rules for
+  `.copcli/archcreator/*`, test, `method.txt` wording; concept section 5.3.
 
 No other code was changed; the defects in section 2 are reported, not fixed.

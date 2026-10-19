@@ -1,6 +1,6 @@
 """Design model (Enterprise Architect `.qea`, read-only) and its comparison with the as-built model.
 
-A `.qea` file is a SQLite database; archrev opens it read-only through a URI and reads three tables:
+A `.qea` file is a SQLite database; archcreator opens it read-only through a URI and reads three tables:
 `t_package` (the package tree), `t_object` (components, ports, interfaces) and `t_operation`. Nothing is written,
 no EA installation is needed, and `.eap` (Access) files are not supported.
 
@@ -29,7 +29,7 @@ from .canonical import guid
 from .model import SIGNAL_PREFIX
 from .rules import INTERFACE_KINDS, _finding
 
-DESIGN_SCHEMA = "archrev.design_compare/1"
+DESIGN_SCHEMA = "archcreator.design_compare/1"
 DEFAULT_SIGNAL_PACKAGES = ("Signals",)
 
 

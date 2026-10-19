@@ -361,7 +361,7 @@ def parse_units(units: list[tuple[str, str]], args: list[str], mapper, app_label
                              r["decl_file"], r["via_macro"]))
 
     return {
-        "schema": "archrev.ir/1",
+        "schema": "archcreator.ir/1",
         "units": sorted(unit_reports, key=lambda u: u["file"]),
         "declarations": [
             {"kind": k, "name": n, "usr": u, "file": f, "line": l, "is_definition": d, "linkage": lk}

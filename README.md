@@ -1,4 +1,4 @@
-# archrev (MVP)
+# archcreator (MVP)
 
 How to work with it, step by step: [docs/MANUAL.md](docs/MANUAL.md) (also as one
 self-contained page, [docs/MANUAL.html](docs/MANUAL.html), rendered by
@@ -6,7 +6,7 @@ self-contained page, [docs/MANUAL.html](docs/MANUAL.html), rendered by
 is the reference.
 
 Deterministic architecture analysis of one C module. Given a repository and a
-module name (the C file name without `.c`), archrev parses the App folder with
+module name (the C file name without `.c`), archcreator parses the App folder with
 libclang and writes an as-built model of the module, rule findings and a review
 report. No LLM, no network access, no randomness: identical inputs produce
 byte-identical outputs.
@@ -18,8 +18,8 @@ Two distributions with identical results (verified byte for byte on fx01 and
 
 | Distribution | Needs | Profiles |
 |---|---|---|
-| `archrev-<v>-win64.zip`: unpack, run `archrev\archrev.exe` | nothing (Python and libclang are inside) | `archrev\profiles\` (copied at build time) |
-| `archrev-<v>-py3-none-any.whl`: `pip install archrev-<v>-py3-none-any.whl` | Python 3.11+, pip (pulls libclang, lizard, PyYAML) | set `ARCHREV_PROFILES` |
+| `archcreator-<v>-win64.zip`: unpack, run `archcreator\archcreator.exe` | nothing (Python and libclang are inside) | `archcreator\profiles\` (copied at build time) |
+| `archcreator-<v>-py3-none-any.whl`: `pip install archcreator-<v>-py3-none-any.whl` | Python 3.11+, pip (pulls libclang, lizard, PyYAML) | set `ARCHCREATOR_PROFILES` |
 
 Build both with `python packaging/build.py` (after `pip install -e .[build]`);
 they land in `dist/`.
@@ -36,14 +36,14 @@ Pinned analyzers: libclang 18.1.1, lizard 1.17.13, PyYAML 6.0.2.
 ## Usage
 
 ```
-archrev analyze --repo <target repo> --module <Name> [--context A,B|all] [--profile <profile.yaml>] [--profiles-dir <dir>]
+archcreator analyze --repo <target repo> --module <Name> [--context A,B|all] [--profile <profile.yaml>] [--profiles-dir <dir>]
                 [--scope <dir>]... [--out <dir>] [--fail-on info|minor|major|critical] [--xmi]
                 [--baseline <accepted.yaml>] [--design <model.qea> | --no-design]
-archrev scan    --repo <target repo> (--modules A,B | --all) [--out <dir>]   (same options as analyze; one parse)
-archrev export-xmi --in <analyze output folder> [--out <file.xmi>]
-archrev baseline-draft --in <analyze output folder> [--out <file.yaml>]
-archrev list-modules --repo <target repo> [--profile <profile.yaml>] [--profiles-dir <dir>] [--scope <dir>]... [--json]
-archrev version [--json]
+archcreator scan    --repo <target repo> (--modules A,B | --all) [--out <dir>]   (same options as analyze; one parse)
+archcreator export-xmi --in <analyze output folder> [--out <file.xmi>]
+archcreator baseline-draft --in <analyze output folder> [--out <file.yaml>]
+archcreator list-modules --repo <target repo> [--profile <profile.yaml>] [--profiles-dir <dir>] [--scope <dir>]... [--json]
+archcreator version [--json]
 ```
 
 Module names are letters, digits and `_` only.
@@ -51,7 +51,7 @@ Module names are letters, digits and `_` only.
 Example (BMW PCU48):
 
 ```
-archrev analyze --repo ..\100554_mc_appl --module DCDC_FSM
+archcreator analyze --repo ..\100554_mc_appl --module DCDC_FSM
 ```
 
 ### Scope, modules and what a run parses
@@ -76,7 +76,7 @@ archrev analyze --repo ..\100554_mc_appl --module DCDC_FSM
   0.5 s per unit on 100554), so a single module with no context takes a
   second, `scan --all` over `software/source/flex` about half a minute.
 
-### Outputs (`archrev-out/<Name>/` by default)
+### Outputs (`archcreator-out/<Name>/` by default)
 
 | File | Content | Canonical |
 |---|---|---|
@@ -84,7 +84,7 @@ archrev analyze --repo ..\100554_mc_appl --module DCDC_FSM
 | `model.json` | Module model: files, provided interface, typed outgoing/incoming dependencies with evidence, unresolved calls, metrics, accounting check | yes |
 | `findings.json` | Rule findings with stable fingerprints | yes |
 | `report.md` | Review report | yes |
-| `summary.json` | Small digest for front ends (schema `archrev.summary/1`): exit code, commit, parse coverage, finding counts, first 20 findings, dependency counts | yes |
+| `summary.json` | Small digest for front ends (schema `archcreator.summary/1`): exit code, commit, parse coverage, finding counts, first 20 findings, dependency counts | yes |
 | `model.xmi` | Only with `--xmi`: the model as XMI 2.1 for Enterprise Architect 16 (see below) | yes |
 | `design_compare.json` | Only with a design model: provided/required interfaces of the design matched against the code | yes |
 | `manifest.json` | Versions, profile hash, target commit, parse coverage, output hashes | yes |
@@ -103,7 +103,7 @@ appears depends on the context parsed with the module:
 
 | Package | Content |
 |---|---|
-| `BlackBox` | Component `<Module>` «as-built», run info as tagged values (commit, archrev version, profile, parse coverage), diagram `<Module> (as-built)` |
+| `BlackBox` | Component `<Module>` «as-built», run info as tagged values (commit, archcreator version, profile, parse coverage), diagram `<Module> (as-built)` |
 | `Interfaces` | One Interface per provided function («Function», one operation) or global («Variable», one attribute), Realization from the component |
 | `Context/<Other>` | Per other module a Component (stereotype `c_module`, `header_only`, `external`, `not_in_build`) and the Interfaces of the symbols the target uses from it («Function», «Variable», «Macro», «EnumConstant») |
 
@@ -116,15 +116,28 @@ Includes appear only in those Dependencies.
 Import in EA 16: select the target package (a scratch package or a copy of the
 model, never the design packages), *Publish > Import > XMI File*. IDs are EA
 style UUIDv5, so importing the same module again replaces the earlier as-built
-package. Types and signatures are not exported: archrev does not record them.
-archrev never writes `.qea`/`.eap` files.
+package. Types and signatures are not exported: archcreator does not record them.
+archcreator never writes `.qea`/`.eap` files.
 
 ### Front ends
 
-`summary.json`, `list-modules --json` (schema `archrev.modules/1`) and
+`summary.json`, `list-modules --json` (schema `archcreator.modules/1`) and
 `version --json` are the contract for front ends. copcli uses them through its
-Arch Rev agent (`/archrev <Module>`); see `docs/copcli_integration_concept.md`.
-The front end explains findings; the findings and the exit code are archrev's.
+ArchCreator agent (`/archcreator <Module>`); see `docs/copcli_integration_concept.md`.
+The front end explains findings; the findings and the exit code are archcreator's.
+
+### MCP server
+
+`archcreator mcp --repo <repository> [--profile P | --profiles-dir D] [--scope S] [--out-root DIR]`
+serves the analysis to any MCP client over stdin/stdout (newline-delimited JSON-RPC 2.0, no SDK, no
+network). Tools: `archcreator_list_modules`, `archcreator_analyze` (`module`, `context`, `xmi`),
+`archcreator_scan` (`modules` or `all`, `xmi`) and `archcreator_read` (one result file of an analyzed
+module or of the scan). Repository, profile, scope and output root are fixed at start; a client can
+pass module names and switches only, never a path, a profile or a command. Exit codes 2 to 5 come
+back as error results, exit code 1 as an ordinary result. Results go to
+`<out-root>/modules/<module>` and `<out-root>/scan`; each run starts from an empty folder (only a
+folder with archcreator's marker file, or an empty one, is ever deleted). Client configuration for Claude Code and
+flexcli: `docs/MANUAL.md`, section 13.
 
 Canonical files contain no timestamps or absolute paths. GUIDs are UUIDv5 of
 canonical IDs (`module:<path>`, `dep:<from>-><to>:<kind>:<symbol>:<usr>`), so
@@ -202,15 +215,15 @@ Interface «Signal» per signal. Accesses: `read`, `write`, `test`,
 
 ## Repository scan
 
-`archrev scan --modules A,B` (or `--all`) parses the named modules once and
+`archcreator scan --modules A,B` (or `--all`) parses the named modules once and
 writes each one's view into `<out>/<Module>/`, byte for byte what `analyze`
 with the same context would write, plus the level above the modules:
 
 | File | Content |
 |---|---|
-| `graph.json` | Schema `archrev.graph/1`: every module any view mentions (with its kind and layer) and the aggregated edges between modules with their kinds, counts and first evidence per kind |
+| `graph.json` | Schema `archcreator.graph/1`: every module any view mentions (with its kind and layer) and the aggregated edges between modules with their kinds, counts and first evidence per kind |
 | `scan_findings.json` | All modules' findings merged by fingerprint (so BUILD-001 appears once) plus ARCH-001, LAYER-001 and EXPORT-001 |
-| `scan_summary.json` | Schema `archrev.scan_summary/1`: exit code, per-module exit codes and counts, graph size, the first 30 findings |
+| `scan_summary.json` | Schema `archcreator.scan_summary/1`: exit code, per-module exit codes and counts, graph size, the first 30 findings |
 | `scan_report.md` | Modules table, repository-level findings, layers, the App module graph |
 
 The exit code is the worst of the modules' codes and the gate over the merged
@@ -235,7 +248,7 @@ layers:
 
 ## Design comparison (Enterprise Architect)
 
-archrev reads the design model read-only, straight from the `.qea` file (it is
+archcreator reads the design model read-only, straight from the `.qea` file (it is
 a SQLite database), without an EA installation, and compares it with the
 as-built model. Nothing is ever written to the model; `.eap` files are not
 supported.
@@ -247,7 +260,7 @@ design:
   signal_packages: [Signals]                             # interfaces below such a package are signals
 ```
 
-For the module archrev looks for the Component of that name in a `BlackBox`
+For the module archcreator looks for the Component of that name in a `BlackBox`
 package below `component_root`, its ProvidedInterface ports (the operations of
 the classifier interface are the function names; a port without classifier
 counts by its name) and its RequiredInterface ports (signal interfaces or
@@ -296,8 +309,8 @@ accepted:
   the counts, sorted last.
 - Entries whose fingerprint no longer occurs are listed as stale in the
   manifest, summary and report.
-- `archrev baseline-draft --in <folder>` writes every current finding with
-  `TODO` placeholders; archrev refuses the file until a person has filled in
+- `archcreator baseline-draft --in <folder>` writes every current finding with
+  `TODO` placeholders; archcreator refuses the file until a person has filled in
   `reason`, `approved_by` and `date`. Unknown keys, bad dates, duplicate or
   malformed fingerprints and a rule that does not match the finding are errors
   (exit 2).
@@ -311,7 +324,7 @@ hide App symbols. Errors confined to external headers (for example Diab
 ## Profile
 
 Profiles are kept centrally (`profiles/` in this repository is the source).
-Without `--profile`, archrev picks the profile whose `match` names the target
+Without `--profile`, archcreator picks the profile whose `match` names the target
 repository:
 
 ```yaml
@@ -321,7 +334,7 @@ match:
 ```
 
 Search order: `--profiles-dir` (repeatable; replaces the rest), else
-`ARCHREV_PROFILES` (`;`-separated), then the `profiles/` folder shipped with the
+`ARCHCREATOR_PROFILES` (`;`-separated), then the `profiles/` folder shipped with the
 executable or the source checkout. Several matching profiles are a usage error
 (exit 2); no match means built-in defaults. `summary.json` and `manifest.json`
 record which profile was used and how (`explicit`, `central`, `none`).

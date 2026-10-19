@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev.cli import main
-from archrev.pipeline import EXIT_OK
-from archrev.profile import ProfileError, load_profile
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_OK
+from archcreator.profile import ProfileError, load_profile
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx02"
 PROFILE = FIXTURE / "profile.yaml"

@@ -37,9 +37,9 @@ EXIT_PARSE_GATE = 3
 EXIT_ACCOUNTING = 4
 EXIT_INTERNAL = 5  # a bug or a broken installation, never a finding
 
-SUMMARY_SCHEMA = "archrev.summary/1"
+SUMMARY_SCHEMA = "archcreator.summary/1"
 TOP_FINDINGS = 20
-MODULES_SCHEMA = "archrev.modules/1"
+MODULES_SCHEMA = "archcreator.modules/1"
 
 
 def _git(repo: Path, *args: str) -> str | None:
@@ -171,7 +171,7 @@ def export_xmi(out_dir: Path, target: Path | None = None) -> Path:
         model = json.loads((out_dir / "model.json").read_text(encoding="utf-8"))
         manifest = json.loads((out_dir / "manifest.json").read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
-        raise DiscoveryError(f"not an archrev output folder (run analyze first): {exc.filename}") from None
+        raise DiscoveryError(f"not an archcreator output folder (run analyze first): {exc.filename}") from None
     target = target or out_dir / "model.xmi"
     write_text(target, render_xmi(model, manifest))
     return target
@@ -383,12 +383,12 @@ def _analyze_module(repo: Path, profile, prep: Prepared, module: str, target_lab
     outputs = {
         "ir.json": write_json(out_dir / "ir.json", prep.ir),
         "model.json": write_json(out_dir / "model.json", model),
-        "findings.json": write_json(out_dir / "findings.json", {"schema": "archrev.findings/1", "findings": findings}),
+        "findings.json": write_json(out_dir / "findings.json", {"schema": "archcreator.findings/1", "findings": findings}),
     }
     if design_record is not None:
         outputs["design_compare.json"] = write_json(out_dir / "design_compare.json", design_record)
     manifest = {
-        "schema": "archrev.run_manifest/1",
+        "schema": "archcreator.run_manifest/1",
         "tool_version": __version__,
         "analyzer_versions": {"libclang": libclang_version(), "lizard": lizard_version(),
                               "python": platform.python_version()},
@@ -495,6 +495,24 @@ def run_analysis(repo: Path, module: str, profile, scope: list[str] | None, out_
     return result.code
 
 
+def _check_output_names(names: list[str]) -> None:
+    """Every module gets an output folder named after it: refuse names that are no safe folder name, or that
+    differ only in case (one folder on Windows), instead of writing outside or over a sibling's results."""
+    bad = [n for n in names if not re.fullmatch(r"[A-Za-z0-9_]+", n)]
+    seen: dict[str, str] = {}
+    clash = []
+    for n in names:
+        if (key := n.casefold()) in seen and seen[key] != n:
+            clash.append(f"{seen[key]}/{n}")
+        seen.setdefault(key, n)
+    if bad or clash:
+        raise DiscoveryError(
+            "module names that cannot be output folders: "
+            + "; ".join(x for x in (f"not letters, digits and _ only: {', '.join(bad)}" if bad else "",
+                                    f"differ only in case: {', '.join(clash)}" if clash else "") if x)
+            + ". Rename the file or leave it out of the scope.")
+
+
 def run_scan(repo: Path, profile, scope: list[str] | None, out_dir: Path, fail_on: str | None, xmi: bool = False,
              baseline: Baseline | None = None, design: DesignSpec | None = None, design_path: Path | None = None,
              modules: list[str] | None = None) -> int:
@@ -506,6 +524,7 @@ def run_scan(repo: Path, profile, scope: list[str] | None, out_dir: Path, fail_o
     t0 = time.perf_counter()
     prep = _prepare(repo, profile, _scope(repo, profile, scope), modules or ["all"], log)
     selected = {Path(s).stem: s for s in prep.parsed}
+    _check_output_names(sorted(selected))
     results: list[ModuleResult] = []
     try:
         for name in sorted(selected):

@@ -7,7 +7,7 @@ A baseline never removes a finding. It gives it a status:
 - regressed: in the baseline, but the measured value grew past measured_max (ratchet)
 
 Entries whose fingerprint no longer occurs are reported as stale so the file can be cleaned. The file is validated
-strictly; placeholders left by `archrev baseline-draft` are rejected until a person fills them in.
+strictly; placeholders left by `archcreator baseline-draft` are rejected until a person fills them in.
 """
 
 import datetime
@@ -180,7 +180,7 @@ def draft(findings: list[dict]) -> str:
         if isinstance(measured, (int, float)) and not isinstance(measured, bool):
             entry["measured_max"] = measured
         entries.append(entry)
-    header = ("# archrev baseline draft: every entry needs reason, approved_by and date before archrev accepts it.\n"
+    header = ("# archcreator baseline draft: every entry needs reason, approved_by and date before archcreator accepts it.\n"
               "# measured_max is the ratchet for numeric findings: a larger value counts as regressed.\n")
     return header + yaml.safe_dump({"baseline_version": BASELINE_VERSION, "accepted": entries},
                                    sort_keys=False, allow_unicode=True, width=120)

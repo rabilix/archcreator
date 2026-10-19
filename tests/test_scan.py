@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from archrev.cli import main
-from archrev.pipeline import EXIT_FINDINGS, EXIT_OK, EXIT_USAGE
-from archrev.profile import ProfileError, load_profile
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_FINDINGS, EXIT_OK, EXIT_USAGE
+from archcreator.profile import ProfileError, load_profile
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 PROFILE = FIXTURE / "profile.yaml"
@@ -34,7 +34,7 @@ def scanned(tmp_path_factory) -> Path:
 
 def test_scan_writes_every_in_build_module_and_the_aggregate(scanned):
     summary = _json(scanned / "scan_summary.json")
-    assert summary["schema"] == "archrev.scan_summary/1" and summary["exit_code"] == EXIT_OK
+    assert summary["schema"] == "archcreator.scan_summary/1" and summary["exit_code"] == EXIT_OK
     assert [m["name"] for m in summary["modules"]] == ["alpha", "beta"]
     assert summary["not_in_build"] == ["unused_mod"]
     for name in ("alpha", "beta"):
@@ -74,7 +74,7 @@ def test_merged_findings_carry_build_once_and_the_scan_rules(scanned):
 
 def test_graph_is_canonical(scanned):
     graph = _json(scanned / "graph.json")
-    assert graph["schema"] == "archrev.graph/1"
+    assert graph["schema"] == "archcreator.graph/1"
     ids = [n["id"] for n in graph["nodes"]]
     assert ids == sorted(ids) and all(n["layer"] is None for n in graph["nodes"])
     edge = next(e for e in graph["edges"] if e["from"].endswith("beta.c") and e["to"].endswith("alpha.c"))
@@ -140,7 +140,7 @@ def test_module_subset_and_errors(tmp_path, scanned):
     assert "known among the analyzed modules only" in (out / "scan_report.md").read_text(encoding="utf-8")
     assert _scan(tmp_path / "bad", "--modules", "beta,nope") == EXIT_USAGE
     s = _json(tmp_path / "bad" / "scan_summary.json")
-    assert s["schema"] == "archrev.scan_summary/1" and "nope" in s["error"] and "module" not in s
+    assert s["schema"] == "archcreator.scan_summary/1" and "nope" in s["error"] and "module" not in s
     assert _scan(tmp_path / "bad2", "--modules", "a;b") == EXIT_USAGE
 
 
@@ -208,3 +208,46 @@ def test_baseline_applies_to_scan_findings(tmp_path, scanned):
     s = _json(out / "scan_summary.json")
     assert s["baseline"] == {"file": "b.yaml", "stale_entries": 1, "stale_checked": True}
     assert s["finding_counts"]["by_status"]["accepted"] == 1
+
+
+def _graph(edges: list[tuple[str, str]]) -> dict:
+    ids = sorted({n for e in edges for n in e})
+    return {"nodes": [{"id": i, "kind": "c_module", "name": i} for i in ids],
+            "edges": [{"from": a, "to": b, "kinds": ["call"]} for a, b in edges]}
+
+
+def test_cycle_detection_survives_a_dependency_chain_longer_than_the_recursion_limit():
+    from archcreator.scan import _cycles
+    n = 5000
+    names = [f"m{i:05}" for i in range(n)]
+    chain = [(names[i], names[i + 1]) for i in range(n - 1)]
+    assert _cycles(_graph(chain)) == []
+    (members, cycle), = _cycles(_graph(chain + [(names[-1], names[-3])]))
+    assert members == names[-3:] and cycle[0] == cycle[-1] == names[-3] and len(cycle) == 4
+
+
+def test_cycle_detection_agrees_with_a_brute_force_reference_on_random_graphs():
+    import itertools
+    import random
+    from archcreator.scan import _cycles
+    rng = random.Random(7)
+    for _ in range(300):
+        n = rng.randint(2, 9)
+        names = [f"n{i}" for i in range(n)]
+        edges = sorted({(a, b) for a, b in itertools.product(names, names) if rng.random() < 0.18})
+        if not edges:
+            continue
+        reach = {a: {b for x, b in edges if x == a} for a in names}
+        for _ in range(n):
+            for a in names:
+                reach[a] |= set().union(*(reach[b] for b in reach[a])) if reach[a] else set()
+        expected = sorted({tuple(sorted(b for b in names if b in reach[a] and a in reach[b])) for a in names
+                           if a in reach[a]})
+        adjacency = {}
+        for a, b in edges:
+            adjacency.setdefault(a, set()).add(b)
+        found = _cycles(_graph(edges))
+        assert sorted(tuple(m) for m, _ in found) == [e for e in expected if len(e) > 1]
+        for members, cycle in found:
+            assert cycle[0] == cycle[-1] == members[0] and set(cycle) <= set(members)
+            assert all(b in adjacency[a] for a, b in zip(cycle, cycle[1:]))

@@ -5,8 +5,8 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from archrev.cli import main
-from archrev.pipeline import EXIT_USAGE
+from archcreator.cli import main
+from archcreator.pipeline import EXIT_USAGE
 
 FIXTURE = Path(__file__).parent / "fixtures" / "fx01"
 PROFILE = str(FIXTURE / "profile.yaml")

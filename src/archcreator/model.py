@@ -247,7 +247,7 @@ def build_model(ir: dict, target_id: str, index: ModuleIndex, scope_label: str, 
 
     accounted = internal_count + len(unresolved) + sum(len(e["evidence"]) for e in out_edges) - wrapper_extra
     return {
-        "schema": "archrev.module_model/1",
+        "schema": "archcreator.module_model/1",
         "scope": scope_label,
         "analyzed_modules": sorted(module_name(f"module:{s}") for s in index.parsed),
         "target": {**modules[target_id], "files": target_files},

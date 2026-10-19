@@ -16,8 +16,8 @@ from .baseline import Baseline, apply_baseline
 from .canonical import write_json, write_text
 from .rules import INTERFACE_KINDS, _finding, check_build, sort_findings
 
-GRAPH_SCHEMA = "archrev.graph/1"
-SCAN_SUMMARY_SCHEMA = "archrev.scan_summary/1"
+GRAPH_SCHEMA = "archcreator.graph/1"
+SCAN_SUMMARY_SCHEMA = "archcreator.scan_summary/1"
 SCAN_TOP_FINDINGS = 30
 
 
@@ -86,26 +86,38 @@ def _cycles(graph: dict) -> list[tuple[list[str], list[str]]]:
     on_stack: set[str] = set()
     components: list[list[str]] = []
 
-    def strongconnect(v: str) -> None:
-        index[v] = low[v] = len(index)
-        stack.append(v)
-        on_stack.add(v)
-        for w in adj.get(v, ()):
-            if w not in index:
-                strongconnect(w)
-                low[v] = min(low[v], low[w])
-            elif w in on_stack:
-                low[v] = min(low[v], index[w])
-        if low[v] == index[v]:
-            comp = []
-            while True:
-                w = stack.pop()
-                on_stack.discard(w)
-                comp.append(w)
-                if w == v:
+    def strongconnect(root: str) -> None:
+        # Iterative: a dependency chain of a thousand modules must not hit the recursion limit.
+        index[root] = low[root] = len(index)
+        stack.append(root)
+        on_stack.add(root)
+        work = [(root, iter(adj.get(root, ())))]
+        while work:
+            v, neighbours = work[-1]
+            for w in neighbours:
+                if w not in index:
+                    index[w] = low[w] = len(index)
+                    stack.append(w)
+                    on_stack.add(w)
+                    work.append((w, iter(adj.get(w, ()))))
                     break
-            if len(comp) > 1:
-                components.append(sorted(comp))
+                if w in on_stack:
+                    low[v] = min(low[v], index[w])
+            else:
+                work.pop()
+                if work:
+                    parent = work[-1][0]
+                    low[parent] = min(low[parent], low[v])
+                if low[v] == index[v]:
+                    comp = []
+                    while True:
+                        w = stack.pop()
+                        on_stack.discard(w)
+                        comp.append(w)
+                        if w == v:
+                            break
+                    if len(comp) > 1:
+                        components.append(sorted(comp))
 
     for v in sorted(set(adj) | {w for ws in adj.values() for w in ws}):
         if v not in index:
@@ -119,21 +131,24 @@ def _cycles(graph: dict) -> list[tuple[list[str], list[str]]]:
         path = [start]
         seen = {start}
 
-        def dfs(v: str) -> bool:
-            for w in adj.get(v, ()):
+        # Iterative depth-first search, neighbours in sorted order: the first path back to the start wins.
+        work = [iter(adj.get(start, ()))]
+        while work:
+            for w in work[-1]:
                 if w not in members:
                     continue
                 if w == start:
-                    return True
+                    work.clear()
+                    break
                 if w not in seen:
                     seen.add(w)
                     path.append(w)
-                    if dfs(w):
-                        return True
+                    work.append(iter(adj.get(w, ())))
+                    break
+            else:
+                work.pop()
+                if work:
                     path.pop()
-            return False
-
-        dfs(start)
         cycles.append((comp, path + [start]))
     return cycles
 
@@ -229,7 +244,7 @@ def finish_scan(repo: Path, profile, prep, results, all_models: dict[str, dict],
     outputs = {
         "graph.json": write_json(out_dir / "graph.json", graph),
         "scan_findings.json": write_json(out_dir / "scan_findings.json",
-                                         {"schema": "archrev.findings/1", "findings": findings}),
+                                         {"schema": "archcreator.findings/1", "findings": findings}),
     }
     first = results[0].manifest if results else None
     summary = {
@@ -265,7 +280,7 @@ def finish_scan(repo: Path, profile, prep, results, all_models: dict[str, dict],
 def render_scan_report(summary: dict, graph: dict, findings: list[dict], stale: list[dict], results) -> str:
     lines: list[str] = []
     w = lines.append
-    w(f"# archrev scan report: {', '.join(summary['scope'])}")
+    w(f"# archcreator scan report: {', '.join(summary['scope'])}")
     w("")
     w("| Item | Value |")
     w("|---|---|")

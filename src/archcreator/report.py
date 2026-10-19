@@ -31,7 +31,7 @@ def render(manifest: dict, ir: dict, model: dict, metrics: list[dict], coupling:
     lines: list[str] = []
     w = lines.append
 
-    w(f"# archrev module report: {t['name']}")
+    w(f"# archcreator module report: {t['name']}")
     w("")
     w("| Item | Value |")
     w("|---|---|")

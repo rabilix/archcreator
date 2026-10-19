@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from archrev.discovery import PathMapper
-from archrev.parser import parse_units
+from archcreator.discovery import PathMapper
+from archcreator.parser import parse_units
 
 HEADER = """#ifndef H_H
 #define H_H

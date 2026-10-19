@@ -2,7 +2,7 @@
 
 import sys
 
-from archrev.cli import main
+from archcreator.cli import main
 
 if __name__ == "__main__":
     sys.exit(main())
