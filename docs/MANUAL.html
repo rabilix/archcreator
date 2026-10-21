@@ -449,8 +449,14 @@ archcreator export-xmi --in archcreator-out\SEV
 other module with the interfaces used from it, the signals, Usage connectors
 with the evidence in their notes, and a component diagram. Import: open a
 <strong>copy</strong> of the model or a scratch package, select it, <em>Publish &gt; Import &gt; XMI
-File</em>. Re-importing the same module replaces its package; different modules
-never share an element. The design packages are never written to.</p>
+File</em>. Different modules never share an element. The design packages are
+never written to.</p>
+<p>Checked against EA 16.0 (build 1605): every element, connector, stereotype, tagged
+value and diagram object arrives, with the GUIDs of the file. Importing a module
+whose package already exists makes EA open its <em>Import Package from Native/XMI
+File</em> dialog: answer it there, or delete the old <code>&lt;module&gt; (as-built)</code> package
+first and import again (the result is the same; <code>tools/ea_verify.py</code> does the
+latter, see <code>docs/EA_VERIFY.md</code>).</p>
 <p>EA's own compare cannot pair as-built with design elements (different GUIDs);
 the comparison lives in archcreator (section 9), not in EA.</p>
 <hr />

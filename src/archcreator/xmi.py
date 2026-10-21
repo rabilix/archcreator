@@ -28,6 +28,8 @@ from .canonical import guid
 XMI_TARGET = "ea16"
 EXPORTER_VERSION = "6.5"  # what EA 16 writes into its own XMI 2.1 exports
 TAG_MAX = 255  # EA stores longer tagged values as memos; keep tags short and put lists into the notes
+# EA's own connector type names where they differ from UML (t_connector.Connector_Type, ea_type in its exports)
+_EA_CONNECTOR_TYPE = {"Realization": "Realisation"}
 
 _FUNCTION_KINDS = {"call", "fn_address"}
 _VARIABLE_KINDS = {"global_read", "global_write", "global_addr"}
@@ -278,7 +280,7 @@ def _ext_connectors(b: _Builder, out: list[str]) -> None:
                 f"</source>",
                 f'\t\t\t\t<target xmi:idref="{dst["id"]}"><model type="{dst["type"]}" name="{_attr(dst["name"])}"/>'
                 f"</target>",
-                f'\t\t\t\t<properties ea_type="{c["type"]}" direction="Source -&gt; Destination"{stereo}/>',
+                f'\t\t\t\t<properties ea_type="{_EA_CONNECTOR_TYPE.get(c["type"], c["type"])}" direction="Source -&gt; Destination"{stereo}/>',
                 f'\t\t\t\t<documentation value="{_attr(c["doc"])}"/>']
         _tags(c["id"], c["tags"], "\t\t\t\t", out)
         out.append("\t\t\t</connector>")

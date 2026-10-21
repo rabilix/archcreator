@@ -314,8 +314,15 @@ writes `model.xmi` (XMI 2.1 with EA's extensions, for EA 16): one package
 other module with the interfaces used from it, the signals, Usage connectors
 with the evidence in their notes, and a component diagram. Import: open a
 **copy** of the model or a scratch package, select it, *Publish > Import > XMI
-File*. Re-importing the same module replaces its package; different modules
-never share an element. The design packages are never written to.
+File*. Different modules never share an element. The design packages are
+never written to.
+
+Checked against EA 16.0 (build 1605): every element, connector, stereotype, tagged
+value and diagram object arrives, with the GUIDs of the file. Importing a module
+whose package already exists makes EA open its *Import Package from Native/XMI
+File* dialog: answer it there, or delete the old `<module> (as-built)` package
+first and import again (the result is the same; `tools/ea_verify.py` does the
+latter, see `docs/EA_VERIFY.md`).
 
 EA's own compare cannot pair as-built with design elements (different GUIDs);
 the comparison lives in archcreator (section 9), not in EA.

@@ -77,6 +77,9 @@ def test_xmi_structure_matches_model(tmp_path):
     assert sorted(i.get("name") for i in interfaces_pkg.findall("packagedElement")) == \
         sorted(f["name"] for f in provided["functions"] + provided["globals"])
     assert len(of_type("uml:Realization")) == len(provided["functions"]) + len(provided["globals"])
+    # EA names connector types its own way (t_connector.Connector_Type, as in the XMI EA 16 itself writes)
+    ea_types = {c.find("properties").get("ea_type") for c in tree.getroot().find("xmi:Extension/connectors", NS)}
+    assert ea_types == {"Realisation", "Usage", "Dependency"}
 
     out_edges = model["dependencies"]["outgoing"]
     provided_usrs = {f["usr"] for f in provided["functions"] + provided["globals"]}
