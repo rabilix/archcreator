@@ -4,6 +4,7 @@ The golden files were written by the code before that change. Regenerate them on
 export, with ARCHCREATOR_UPDATE_GOLDEN=1, and review the diff.
 """
 
+import json
 import os
 from pathlib import Path
 
@@ -29,6 +30,12 @@ def test_xmi_equals_golden(tmp_path, fixture, module, context):
     if context:
         args += ["--context", context]
     assert main(args) in (0, 1)
+    # The fixtures live in this repository: its commit and dirty flag would change the run tags with every commit.
+    manifest_file = tmp_path / "manifest.json"
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+    manifest.update(target_commit="0" * 40, target_dirty=False)
+    manifest_file.write_text(json.dumps(manifest), encoding="utf-8")
+    assert main(["export-xmi", "--in", str(tmp_path)]) == 0
     produced = (tmp_path / "model.xmi").read_bytes()
     golden = GOLDEN / f"{fixture}_{module}.xmi"
     if os.environ.get("ARCHCREATOR_UPDATE_GOLDEN") == "1":

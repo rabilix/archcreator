@@ -63,6 +63,7 @@ def _evidence_lines(evidence: list[dict]) -> list[str]:
 
 class _Builder:
     def __init__(self) -> None:
+        self.trace = True
         self.packages: dict[str, dict] = {}
         self.elements: dict[str, dict] = {}
         self.connectors: list[dict] = []
@@ -70,7 +71,7 @@ class _Builder:
     def package(self, key: str, name: str, parent: str | None, doc: str = "") -> str:
         pid = _xid("EAPK", key)
         if pid not in self.packages:
-            self.packages[pid] = {"id": pid, "name": name, "parent": parent, "doc": doc, "children": [],
+            self.packages[pid] = {"id": pid, "key": key, "name": name, "parent": parent, "doc": doc, "children": [],
                                   "elements": [], "connectors": []}
             if parent:
                 self.packages[parent]["children"].append(pid)
@@ -80,21 +81,28 @@ class _Builder:
                 tags: dict | None = None, feature: str | None = None) -> str:
         eid = _xid("EAID", key)
         if eid not in self.elements:
-            self.elements[eid] = {"id": eid, "type": uml_type, "name": name, "pkg": pkg, "stereotype": stereotype,
-                                  "doc": doc, "tags": tags or {}, "feature": feature}
+            self.elements[eid] = {"id": eid, "key": key, "type": uml_type, "name": name, "pkg": pkg,
+                                  "stereotype": stereotype, "doc": doc, "tags": tags or {}, "feature": feature}
             self.packages[pkg]["elements"].append(eid)
         return eid
 
     def connector(self, key: str, uml_type: str, client: str, supplier: str, stereotype: str | None,
                   doc: str = "", tags: dict | None = None) -> None:
-        c = {"id": _xid("EAID", key), "type": uml_type, "client": client, "supplier": supplier,
+        c = {"id": _xid("EAID", key), "key": key, "type": uml_type, "client": client, "supplier": supplier,
              "stereotype": stereotype, "doc": doc, "tags": tags or {}}
         self.connectors.append(c)
         self.packages[self.elements[client]["pkg"]]["connectors"].append(c)
 
 
-def build(model: dict, manifest: dict) -> _Builder:
+def build(model: dict, manifest: dict, trace: bool = True) -> _Builder:
+    """Packages, elements and connectors of the as-built view, each with the key its id is made from.
+
+    trace=False leaves out what points into the code (plan 2026-11-05, section 8): file lists, definition and
+    declaration places, evidence lines and the evidence tags first_evidence and via_macros. The XMI export always
+    uses trace=True; ea-apply lets the user choose.
+    """
     b = _Builder()
+    b.trace = trace
     target = model["target"]
     tid = target["id"]
     name = target["name"]
@@ -112,7 +120,7 @@ def build(model: dict, manifest: dict) -> _Builder:
                 "target_dirty": str(manifest["target_dirty"]).lower(), "profile": manifest["profile_name"],
                 "parse_coverage": manifest["parse_coverage"]["ratio"], "module_kind": target["kind"]}
     comp = b.element(f"comp:{tid}", "Component", name, blackbox, "as-built",
-                     doc="Files:\n" + "\n".join(target["files"]), tags=run_tags)
+                     doc="Files:\n" + "\n".join(target["files"]) if trace else "", tags=run_tags)
 
     provided: dict[str, str] = {}
     for kind, stereo, feature in (("functions", "Function", "operation"), ("globals", "Variable", "attribute")):
@@ -120,7 +128,7 @@ def build(model: dict, manifest: dict) -> _Builder:
             where = [f"defined at {f['defined_at']}"] if f["defined_at"] else []
             where += [f"declared in {d}" for d in f["declared_in"]]
             iid = b.element(f"prov:{tid}:{f['usr']}", "Interface", f["name"], interfaces, stereo,
-                            doc="\n".join(where), tags={"usr": f["usr"]}, feature=feature)
+                            doc="\n".join(where) if trace else "", tags={"usr": f["usr"]}, feature=feature)
             provided[f["usr"]] = iid
             b.connector(f"real:{tid}:{f['usr']}", "Realization", comp, iid, None)
 
@@ -140,7 +148,8 @@ def build(model: dict, manifest: dict) -> _Builder:
             # Keyed by target too: the same module is a context element in every other module's export, and EA
             # would move one shared element between packages instead of keeping each export self-contained.
             others[module_id] = b.element(f"ctx:{tid}:{module_id}", "Component", m["name"], pkg, m["kind"],
-                                          doc="Files:\n" + "\n".join(m["files"]), tags={"module_id": module_id})
+                                          doc="Files:\n" + "\n".join(m["files"]) if trace else "",
+                                          tags={"module_id": module_id})
         return others[module_id]
 
     summary: dict[tuple[str, str], list[dict]] = defaultdict(list)
@@ -166,7 +175,7 @@ def build(model: dict, manifest: dict) -> _Builder:
         ocomp = other(module_id)
         client, supplier = (comp, ocomp) if direction == "out" else (ocomp, comp)
         counts = Counter(e["kind"] for e in edges)
-        doc = "\n".join(f"{e['kind']} {e['symbol']} ({len(e['evidence'])} uses)" for e in edges)
+        doc = "\n".join(f"{e['kind']} {e['symbol']} ({len(e['evidence'])} uses)" for e in edges) if b.trace else ""
         b.connector(f"dep:{direction}:{tid}:{module_id}", "Dependency", client, supplier, "as-built", doc=doc,
                     tags={"kinds": "; ".join(f"{k}={n}" for k, n in sorted(counts.items())),
                           "evidence_count": sum(len(e["evidence"]) for e in edges)})
@@ -176,11 +185,14 @@ def build(model: dict, manifest: dict) -> _Builder:
 def _usage(b: _Builder, tid: str, edge: dict, client: str, supplier: str) -> None:
     lines = _evidence_lines(edge["evidence"])
     macros = sorted({e["via_macro"] for e in edge["evidence"] if e.get("via_macro")})
-    tags = {"evidence_count": len(lines), "first_evidence": lines[0] if lines else ""}
-    if macros and len("; ".join(macros)) <= TAG_MAX:
-        tags["via_macros"] = "; ".join(macros)
+    tags = {"evidence_count": len(lines)}
+    if b.trace:
+        tags["first_evidence"] = lines[0] if lines else ""
+        if macros and len("; ".join(macros)) <= TAG_MAX:
+            tags["via_macros"] = "; ".join(macros)
     # An edge id is the same seen from either end (A's outgoing edge to B is B's incoming edge from A).
-    b.connector(f"use:{tid}:{edge['id']}", "Usage", client, supplier, edge["kind"], doc="\n".join(lines), tags=tags)
+    b.connector(f"use:{tid}:{edge['id']}", "Usage", client, supplier, edge["kind"],
+                doc="\n".join(lines) if b.trace else "", tags=tags)
 
 
 def render(model: dict, manifest: dict) -> str:
