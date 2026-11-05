@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:thecustomprofile="http://www.sparxsystems.com/profiles/thecustomprofile/1.0">
+	<xmi:Documentation exporter="Enterprise Architect" exporterVersion="6.5" exporterID="archcreator"/>
+	<uml:Model xmi:type="uml:Model" name="EA_Model" visibility="public">
+		<packagedElement xmi:type="uml:Package" xmi:id="EAPK_39103F13_865C_5714_854D_A038082AB540" name="alpha (as-built)" visibility="public">
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_8374DAE5_A25C_5989_B336_1299C14230EE" name="BlackBox" visibility="public">
+				<packagedElement xmi:type="uml:Component" xmi:id="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B" name="alpha" visibility="public"/>
+				<packagedElement xmi:type="uml:Realization" xmi:id="EAID_B5816454_D561_5740_B68B_C4FD43D9F953" visibility="public" supplier="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Realization" xmi:id="EAID_CA0581E8_32AE_5F81_8903_DA16B9066518" visibility="public" supplier="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Realization" xmi:id="EAID_9215396F_AC6F_5442_8BC0_FE46278A2261" visibility="public" supplier="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Realization" xmi:id="EAID_9124762D_F661_5798_8498_CC215D565F1E" visibility="public" supplier="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Realization" xmi:id="EAID_878A102A_69B3_51AE_A64F_637576F338C0" visibility="public" supplier="EAID_E96D0C37_2558_5303_A584_524565E071B0" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_BD34665A_3D7E_5E0F_A206_27CA75F93841" visibility="public" supplier="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_B4A10034_A13F_5E2F_9D9F_E4A5811B4C04" visibility="public" supplier="EAID_65453DB1_BEA7_5061_BA39_4665C8676353" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_2FBC2290_7B4C_568D_9CDD_912326A4CC4F" visibility="public" supplier="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_5BC6EB79_04B6_5A68_9F81_22FD63B47976" visibility="public" supplier="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_CE699E84_4978_538B_A178_5A6D3E70E840" visibility="public" supplier="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355" visibility="public" supplier="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Usage" xmi:id="EAID_8106775E_FC08_5DA5_B792_CB287D6F85E7" visibility="public" supplier="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Dependency" xmi:id="EAID_FBD3B1BE_8A4F_5CE0_A17F_7D921333874D" visibility="public" supplier="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Dependency" xmi:id="EAID_5B61AD26_F5C8_585E_A274_72EE6F778613" visibility="public" supplier="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Dependency" xmi:id="EAID_A33D4DB1_005A_55A9_A3AE_ADC065EB5334" visibility="public" supplier="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				<packagedElement xmi:type="uml:Dependency" xmi:id="EAID_A3E8A110_9F67_5BA6_8AF0_FD1A767EED92" visibility="public" supplier="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76" client="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" name="Interfaces" visibility="public">
+				<packagedElement xmi:type="uml:Interface" xmi:id="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F" name="alpha_init" visibility="public">
+					<ownedOperation xmi:id="EAID_9B279B3D_19FC_5962_8F4E_66E432B4AA4B" name="alpha_init" visibility="public" concurrency="sequential"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Interface" xmi:id="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614" name="alpha_internal" visibility="public">
+					<ownedOperation xmi:id="EAID_224E7B86_E7FF_58E9_8ACF_70F58A4704EC" name="alpha_internal" visibility="public" concurrency="sequential"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Interface" xmi:id="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813" name="alpha_step" visibility="public">
+					<ownedOperation xmi:id="EAID_51CBD973_2B4C_5231_A03C_6B810A8FBF14" name="alpha_step" visibility="public" concurrency="sequential"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Interface" xmi:id="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF" name="wrongName" visibility="public">
+					<ownedOperation xmi:id="EAID_5826DAD0_A340_5236_A27B_4E8AE452D8F5" name="wrongName" visibility="public" concurrency="sequential"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Interface" xmi:id="EAID_E96D0C37_2558_5303_A584_524565E071B0" name="alpha_counter" visibility="public">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_3B1946A8_FF61_5331_839D_CBDA3083317C" name="alpha_counter" visibility="public" isStatic="false" isReadOnly="false"/>
+				</packagedElement>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" name="Context" visibility="public">
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_5001E833_AD37_5F1A_960A_E0A96917ADBE" name="ext.h" visibility="public">
+					<packagedElement xmi:type="uml:Component" xmi:id="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24" name="ext.h" visibility="public"/>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD" name="ext_value" visibility="public">
+						<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_EFDA88F3_83FB_5910_8B3C_0F2E7EDAA328" name="ext_value" visibility="public" isStatic="false" isReadOnly="false"/>
+					</packagedElement>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_277EFAAF_E5A3_58E0_89C1_250E9957B606" name="rte_like.h" visibility="public">
+					<packagedElement xmi:type="uml:Component" xmi:id="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A" name="rte_like.h" visibility="public"/>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_65453DB1_BEA7_5061_BA39_4665C8676353" name="Rte_Call_Beta_Op" visibility="public"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_8A2A1DD0_2504_5A61_B2D0_4AE077858B5C" name="gamma_helper.h" visibility="public">
+					<packagedElement xmi:type="uml:Component" xmi:id="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073" name="gamma_helper.h" visibility="public"/>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4" name="GAMMA_MAX" visibility="public"/>
+				</packagedElement>
+				<packagedElement xmi:type="uml:Package" xmi:id="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" name="beta" visibility="public">
+					<packagedElement xmi:type="uml:Component" xmi:id="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76" name="beta" visibility="public"/>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963" name="beta_api" visibility="public">
+						<ownedOperation xmi:id="EAID_45626AB2_339D_5E1D_8707_26D715BC887A" name="beta_api" visibility="public" concurrency="sequential"/>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05" name="beta_hidden" visibility="public">
+						<ownedOperation xmi:id="EAID_F8A7BF5A_413E_5B3C_A5C5_1C361275AB70" name="beta_hidden" visibility="public" concurrency="sequential"/>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91" name="beta_rte_op" visibility="public">
+						<ownedOperation xmi:id="EAID_2FEFFD1D_0887_5F6F_B8D8_45C3B593E5B7" name="beta_rte_op" visibility="public" concurrency="sequential"/>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Interface" xmi:id="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F" name="beta_api_cb" visibility="public">
+						<ownedOperation xmi:id="EAID_58B3CF07_FC9D_5B41_84B6_3842AB6C4254" name="beta_api_cb" visibility="public" concurrency="sequential"/>
+					</packagedElement>
+					<packagedElement xmi:type="uml:Usage" xmi:id="EAID_7D4D399B_A150_5A84_8AA3_33C80523EE79" visibility="public" supplier="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614" client="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"/>
+					<packagedElement xmi:type="uml:Usage" xmi:id="EAID_6F484FE0_B718_5498_938E_F09D5960DD56" visibility="public" supplier="EAID_E96D0C37_2558_5303_A584_524565E071B0" client="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"/>
+					<packagedElement xmi:type="uml:Dependency" xmi:id="EAID_49A796C6_B09D_5274_ABD9_4085B1716F36" visibility="public" supplier="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B" client="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"/>
+				</packagedElement>
+			</packagedElement>
+		</packagedElement>
+	</uml:Model>
+	<thecustomprofile:as-built base_Component="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+	<thecustomprofile:Function base_Interface="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F"/>
+	<thecustomprofile:Function base_Interface="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614"/>
+	<thecustomprofile:Function base_Interface="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813"/>
+	<thecustomprofile:Function base_Interface="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF"/>
+	<thecustomprofile:Variable base_Interface="EAID_E96D0C37_2558_5303_A584_524565E071B0"/>
+	<thecustomprofile:external base_Component="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24"/>
+	<thecustomprofile:Variable base_Interface="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD"/>
+	<thecustomprofile:external base_Component="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A"/>
+	<thecustomprofile:Macro base_Interface="EAID_65453DB1_BEA7_5061_BA39_4665C8676353"/>
+	<thecustomprofile:header_only base_Component="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073"/>
+	<thecustomprofile:Macro base_Interface="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4"/>
+	<thecustomprofile:c_module base_Component="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"/>
+	<thecustomprofile:Function base_Interface="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963"/>
+	<thecustomprofile:Function base_Interface="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05"/>
+	<thecustomprofile:Function base_Interface="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91"/>
+	<thecustomprofile:Function base_Interface="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F"/>
+	<thecustomprofile:global_read base_Usage="EAID_BD34665A_3D7E_5E0F_A206_27CA75F93841"/>
+	<thecustomprofile:macro_use base_Usage="EAID_B4A10034_A13F_5E2F_9D9F_E4A5811B4C04"/>
+	<thecustomprofile:macro_use base_Usage="EAID_2FBC2290_7B4C_568D_9CDD_912326A4CC4F"/>
+	<thecustomprofile:call base_Usage="EAID_5BC6EB79_04B6_5A68_9F81_22FD63B47976"/>
+	<thecustomprofile:call base_Usage="EAID_CE699E84_4978_538B_A178_5A6D3E70E840"/>
+	<thecustomprofile:call base_Usage="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355"/>
+	<thecustomprofile:fn_address base_Usage="EAID_8106775E_FC08_5DA5_B792_CB287D6F85E7"/>
+	<thecustomprofile:call base_Usage="EAID_7D4D399B_A150_5A84_8AA3_33C80523EE79"/>
+	<thecustomprofile:global_write base_Usage="EAID_6F484FE0_B718_5498_938E_F09D5960DD56"/>
+	<thecustomprofile:as-built base_Dependency="EAID_FBD3B1BE_8A4F_5CE0_A17F_7D921333874D"/>
+	<thecustomprofile:as-built base_Dependency="EAID_5B61AD26_F5C8_585E_A274_72EE6F778613"/>
+	<thecustomprofile:as-built base_Dependency="EAID_A33D4DB1_005A_55A9_A3AE_ADC065EB5334"/>
+	<thecustomprofile:as-built base_Dependency="EAID_49A796C6_B09D_5274_ABD9_4085B1716F36"/>
+	<thecustomprofile:as-built base_Dependency="EAID_A3E8A110_9F67_5BA6_8AF0_FD1A767EED92"/>
+	<xmi:Extension extender="Enterprise Architect" extenderID="6.5">
+		<elements>
+			<element xmi:idref="EAPK_39103F13_865C_5714_854D_A038082AB540" xmi:type="uml:Package" name="alpha (as-built)" scope="public">
+				<model package2="EAID_39103F13_865C_5714_854D_A038082AB540" ea_eleType="package"/>
+				<properties documentation="Generated by archcreator 0.1.0 from commit a88319ca967aa1770c4b04e7df741f9e2ee4cada. As-built view of the code, not design. Do not edit; re-import replaces it." isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_8374DAE5_A25C_5989_B336_1299C14230EE" xmi:type="uml:Package" name="BlackBox" scope="public">
+				<model package2="EAID_8374DAE5_A25C_5989_B336_1299C14230EE" package="EAPK_39103F13_865C_5714_854D_A038082AB540" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" xmi:type="uml:Package" name="Interfaces" scope="public">
+				<model package2="EAID_2FECFD0A_45C5_527F_9859_B7A99CAA2035" package="EAPK_39103F13_865C_5714_854D_A038082AB540" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" xmi:type="uml:Package" name="Context" scope="public">
+				<model package2="EAID_DAFBE9B8_26C1_5092_8902_BFB1590525A0" package="EAPK_39103F13_865C_5714_854D_A038082AB540" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_5001E833_AD37_5F1A_960A_E0A96917ADBE" xmi:type="uml:Package" name="ext.h" scope="public">
+				<model package2="EAID_5001E833_AD37_5F1A_960A_E0A96917ADBE" package="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_277EFAAF_E5A3_58E0_89C1_250E9957B606" xmi:type="uml:Package" name="rte_like.h" scope="public">
+				<model package2="EAID_277EFAAF_E5A3_58E0_89C1_250E9957B606" package="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_8A2A1DD0_2504_5A61_B2D0_4AE077858B5C" xmi:type="uml:Package" name="gamma_helper.h" scope="public">
+				<model package2="EAID_8A2A1DD0_2504_5A61_B2D0_4AE077858B5C" package="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" xmi:type="uml:Package" name="beta" scope="public">
+				<model package2="EAID_7550222D_2C78_5AB6_91AA_C42E43E2C303" package="EAPK_DAFBE9B8_26C1_5092_8902_BFB1590525A0" ea_eleType="package"/>
+				<properties documentation="" isSpecification="false" sType="Package" nType="0" scope="public"/>
+			</element>
+			<element xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B" xmi:type="uml:Component" name="alpha" scope="public">
+				<model package="EAPK_8374DAE5_A25C_5989_B336_1299C14230EE" ea_eleType="element"/>
+				<properties documentation="Files:&#xA;src/App/alpha.c&#xA;src/App/alpha.h&#xA;src/App/alpha_cfg.h" isSpecification="false" sType="Component" nType="0" scope="public" stereotype="as-built"/>
+				<tags>
+					<tag xmi:id="EAID_E1E05CA0_7373_5EB6_A94E_8458C739051F" name="archcreator_version" value="0.1.0" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+					<tag xmi:id="EAID_4111ADFF_A770_5BC5_B32D_68632BF26CF8" name="module_kind" value="c_module" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+					<tag xmi:id="EAID_485A4E99_370B_553A_B0B6_08F1F7B31071" name="parse_coverage" value="1.0" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+					<tag xmi:id="EAID_6AD7D145_51A3_50B2_BA33_C379A7561648" name="profile" value="fx01" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+					<tag xmi:id="EAID_53883266_318A_5731_B097_367F82208100" name="target_commit" value="a88319ca967aa1770c4b04e7df741f9e2ee4cada" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+					<tag xmi:id="EAID_F2D45220_CF68_58AD_854B_E400EA81EEAB" name="target_dirty" value="false" modelElement="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F" xmi:type="uml:Interface" name="alpha_init" scope="public">
+				<model package="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" ea_eleType="element"/>
+				<properties documentation="defined at src/App/alpha.c:20&#xA;declared in src/App/alpha.h:8" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_DD581108_2CDD_5C76_9863_370295F3197F" name="usr" value="c:@F@alpha_init" modelElement="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614" xmi:type="uml:Interface" name="alpha_internal" scope="public">
+				<model package="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" ea_eleType="element"/>
+				<properties documentation="defined at src/App/alpha.c:28" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_DD4196E7_38E3_581F_ACB9_D8CE4A2B58C5" name="usr" value="c:@F@alpha_internal" modelElement="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813" xmi:type="uml:Interface" name="alpha_step" scope="public">
+				<model package="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" ea_eleType="element"/>
+				<properties documentation="defined at src/App/alpha.c:34&#xA;declared in src/App/alpha.h:9" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_B7BCF4D1_8F01_5F61_A8C5_0F287062C256" name="usr" value="c:@F@alpha_step" modelElement="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF" xmi:type="uml:Interface" name="wrongName" scope="public">
+				<model package="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" ea_eleType="element"/>
+				<properties documentation="defined at src/App/alpha.c:65&#xA;declared in src/App/alpha.h:10" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_42FB9AE2_1ED5_5742_9535_252ACB1E9AE5" name="usr" value="c:@F@wrongName" modelElement="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_E96D0C37_2558_5303_A584_524565E071B0" xmi:type="uml:Interface" name="alpha_counter" scope="public">
+				<model package="EAPK_2FECFD0A_45C5_527F_9859_B7A99CAA2035" ea_eleType="element"/>
+				<properties documentation="defined at src/App/alpha.c:11&#xA;declared in src/App/alpha.h:6" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Variable"/>
+				<tags>
+					<tag xmi:id="EAID_9F9AD16C_3D52_5715_9EE7_AA80AFA409C6" name="usr" value="c:@alpha_counter" modelElement="EAID_E96D0C37_2558_5303_A584_524565E071B0"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24" xmi:type="uml:Component" name="ext.h" scope="public">
+				<model package="EAPK_5001E833_AD37_5F1A_960A_E0A96917ADBE" ea_eleType="element"/>
+				<properties documentation="Files:&#xA;src/lib/ext.h" isSpecification="false" sType="Component" nType="0" scope="public" stereotype="external"/>
+				<tags>
+					<tag xmi:id="EAID_43D1BBE2_F41E_5EDE_B786_3AF337763654" name="module_id" value="external:src/lib/ext.h" modelElement="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD" xmi:type="uml:Interface" name="ext_value" scope="public">
+				<model package="EAPK_5001E833_AD37_5F1A_960A_E0A96917ADBE" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Variable"/>
+				<tags>
+					<tag xmi:id="EAID_4D1C0FA1_66C9_5FAB_83B7_424ADEA1AAF9" name="usr" value="c:@ext_value" modelElement="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A" xmi:type="uml:Component" name="rte_like.h" scope="public">
+				<model package="EAPK_277EFAAF_E5A3_58E0_89C1_250E9957B606" ea_eleType="element"/>
+				<properties documentation="Files:&#xA;src/lib/rte_like.h" isSpecification="false" sType="Component" nType="0" scope="public" stereotype="external"/>
+				<tags>
+					<tag xmi:id="EAID_6611B69F_E7C6_509C_A8E1_B74B20CAF8C1" name="module_id" value="external:src/lib/rte_like.h" modelElement="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_65453DB1_BEA7_5061_BA39_4665C8676353" xmi:type="uml:Interface" name="Rte_Call_Beta_Op" scope="public">
+				<model package="EAPK_277EFAAF_E5A3_58E0_89C1_250E9957B606" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Macro"/>
+				<tags>
+					<tag xmi:id="EAID_D73F7423_7E7B_5C01_92FF_DBA477EB36FA" name="usr" value="c:src/lib/rte_like.h@macro@Rte_Call_Beta_Op" modelElement="EAID_65453DB1_BEA7_5061_BA39_4665C8676353"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073" xmi:type="uml:Component" name="gamma_helper.h" scope="public">
+				<model package="EAPK_8A2A1DD0_2504_5A61_B2D0_4AE077858B5C" ea_eleType="element"/>
+				<properties documentation="Files:&#xA;src/App/gamma_helper.h" isSpecification="false" sType="Component" nType="0" scope="public" stereotype="header_only"/>
+				<tags>
+					<tag xmi:id="EAID_6B3D1AEE_4DEE_5BC5_94EC_1DBD38A5E865" name="module_id" value="header:src/App/gamma_helper.h" modelElement="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4" xmi:type="uml:Interface" name="GAMMA_MAX" scope="public">
+				<model package="EAPK_8A2A1DD0_2504_5A61_B2D0_4AE077858B5C" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Macro"/>
+				<tags>
+					<tag xmi:id="EAID_C76F3C5D_44A7_5C5F_892F_68647D1338B0" name="usr" value="c:src/App/gamma_helper.h@macro@GAMMA_MAX" modelElement="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76" xmi:type="uml:Component" name="beta" scope="public">
+				<model package="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" ea_eleType="element"/>
+				<properties documentation="Files:&#xA;src/App/beta.c&#xA;src/App/beta.h" isSpecification="false" sType="Component" nType="0" scope="public" stereotype="c_module"/>
+				<tags>
+					<tag xmi:id="EAID_B74F25E8_697B_5D5C_9029_E6E1EF8A0657" name="module_id" value="module:src/App/beta.c" modelElement="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963" xmi:type="uml:Interface" name="beta_api" scope="public">
+				<model package="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_1ADD5B2F_C809_50C2_99BF_6B0CCA4E12F3" name="usr" value="c:@F@beta_api" modelElement="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05" xmi:type="uml:Interface" name="beta_hidden" scope="public">
+				<model package="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_BBB29635_0F15_54D7_A28C_776C06F3095C" name="usr" value="c:@F@beta_hidden" modelElement="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91" xmi:type="uml:Interface" name="beta_rte_op" scope="public">
+				<model package="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_17DB376F_3086_51CF_9255_FBC0FE96CE0E" name="usr" value="c:@F@beta_rte_op" modelElement="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91"/>
+				</tags>
+			</element>
+			<element xmi:idref="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F" xmi:type="uml:Interface" name="beta_api_cb" scope="public">
+				<model package="EAPK_7550222D_2C78_5AB6_91AA_C42E43E2C303" ea_eleType="element"/>
+				<properties documentation="" isSpecification="false" sType="Interface" nType="0" scope="public" stereotype="Function"/>
+				<tags>
+					<tag xmi:id="EAID_97DFB637_5849_57D8_8BF2_841F2C6EA22B" name="usr" value="c:@F@beta_api_cb" modelElement="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F"/>
+				</tags>
+			</element>
+		</elements>
+		<connectors>
+			<connector xmi:idref="EAID_B5816454_D561_5740_B68B_C4FD43D9F953">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F"><model type="Interface" name="alpha_init"/></target>
+				<properties ea_type="Realisation" direction="Source -&gt; Destination"/>
+				<documentation value=""/>
+			</connector>
+			<connector xmi:idref="EAID_CA0581E8_32AE_5F81_8903_DA16B9066518">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614"><model type="Interface" name="alpha_internal"/></target>
+				<properties ea_type="Realisation" direction="Source -&gt; Destination"/>
+				<documentation value=""/>
+			</connector>
+			<connector xmi:idref="EAID_9215396F_AC6F_5442_8BC0_FE46278A2261">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813"><model type="Interface" name="alpha_step"/></target>
+				<properties ea_type="Realisation" direction="Source -&gt; Destination"/>
+				<documentation value=""/>
+			</connector>
+			<connector xmi:idref="EAID_9124762D_F661_5798_8498_CC215D565F1E">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF"><model type="Interface" name="wrongName"/></target>
+				<properties ea_type="Realisation" direction="Source -&gt; Destination"/>
+				<documentation value=""/>
+			</connector>
+			<connector xmi:idref="EAID_878A102A_69B3_51AE_A64F_637576F338C0">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_E96D0C37_2558_5303_A584_524565E071B0"><model type="Interface" name="alpha_counter"/></target>
+				<properties ea_type="Realisation" direction="Source -&gt; Destination"/>
+				<documentation value=""/>
+			</connector>
+			<connector xmi:idref="EAID_BD34665A_3D7E_5E0F_A206_27CA75F93841">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_7EE09062_E96C_53AF_AE1D_F7AB8ECF6FAD"><model type="Interface" name="ext_value"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="global_read"/>
+				<documentation value="src/App/alpha.c:39 in alpha_step"/>
+				<tags>
+					<tag xmi:id="EAID_BD9D9A7E_035C_5CCB_8136_11DCEB52D0FE" name="evidence_count" value="1" modelElement="EAID_BD34665A_3D7E_5E0F_A206_27CA75F93841"/>
+					<tag xmi:id="EAID_6E846F19_20F8_5B53_A7E9_D2493C23CC2C" name="first_evidence" value="src/App/alpha.c:39 in alpha_step" modelElement="EAID_BD34665A_3D7E_5E0F_A206_27CA75F93841"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_B4A10034_A13F_5E2F_9D9F_E4A5811B4C04">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_65453DB1_BEA7_5061_BA39_4665C8676353"><model type="Interface" name="Rte_Call_Beta_Op"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="macro_use"/>
+				<documentation value="src/App/alpha.c:24 in alpha_init"/>
+				<tags>
+					<tag xmi:id="EAID_5F4219C9_2101_530B_A349_F91FB76EA670" name="evidence_count" value="1" modelElement="EAID_B4A10034_A13F_5E2F_9D9F_E4A5811B4C04"/>
+					<tag xmi:id="EAID_FA5A8938_0623_5A91_9078_7D4BACDF9DA6" name="first_evidence" value="src/App/alpha.c:24 in alpha_init" modelElement="EAID_B4A10034_A13F_5E2F_9D9F_E4A5811B4C04"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_2FBC2290_7B4C_568D_9CDD_912326A4CC4F">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_3B1CD778_4B9C_5101_8177_63C8DB0B56C4"><model type="Interface" name="GAMMA_MAX"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="macro_use"/>
+				<documentation value="src/App/alpha.c:40 in alpha_step"/>
+				<tags>
+					<tag xmi:id="EAID_009FB76D_9345_59F2_8C3B_CDEFF5DC6A7F" name="evidence_count" value="1" modelElement="EAID_2FBC2290_7B4C_568D_9CDD_912326A4CC4F"/>
+					<tag xmi:id="EAID_34F8C247_296C_58DC_983A_2E54709E996D" name="first_evidence" value="src/App/alpha.c:40 in alpha_step" modelElement="EAID_2FBC2290_7B4C_568D_9CDD_912326A4CC4F"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_5BC6EB79_04B6_5A68_9F81_22FD63B47976">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_70D658DE_C0E2_5A53_AE48_F5CE7CA10963"><model type="Interface" name="beta_api"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="call"/>
+				<documentation value="src/App/alpha.c:37 in alpha_step"/>
+				<tags>
+					<tag xmi:id="EAID_4B41ED39_87E4_5E99_A370_A2BD295FFE00" name="evidence_count" value="1" modelElement="EAID_5BC6EB79_04B6_5A68_9F81_22FD63B47976"/>
+					<tag xmi:id="EAID_35C8333B_08C6_53B4_9B4F_7715C0E41818" name="first_evidence" value="src/App/alpha.c:37 in alpha_step" modelElement="EAID_5BC6EB79_04B6_5A68_9F81_22FD63B47976"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_CE699E84_4978_538B_A178_5A6D3E70E840">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_1D0A1701_4167_575D_B64D_82BBF70AAE05"><model type="Interface" name="beta_hidden"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="call"/>
+				<documentation value="src/App/alpha.c:38 in alpha_step"/>
+				<tags>
+					<tag xmi:id="EAID_9F2BC469_C294_5627_BF4F_4AF47EFC6F02" name="evidence_count" value="1" modelElement="EAID_CE699E84_4978_538B_A178_5A6D3E70E840"/>
+					<tag xmi:id="EAID_88EB7173_7C31_5209_8C1F_C14FA0A69D7A" name="first_evidence" value="src/App/alpha.c:38 in alpha_step" modelElement="EAID_CE699E84_4978_538B_A178_5A6D3E70E840"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_36867BD7_5FB3_5EC9_8178_AA70B3D96B91"><model type="Interface" name="beta_rte_op"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="call"/>
+				<documentation value="src/App/alpha.c:24 in alpha_init via macro Rte_Call_Beta_Op"/>
+				<tags>
+					<tag xmi:id="EAID_2D61F224_5C3D_5087_B142_5248B4777F9D" name="evidence_count" value="1" modelElement="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355"/>
+					<tag xmi:id="EAID_F113D0FC_9A6C_5E8E_B32A_EAC270C19030" name="first_evidence" value="src/App/alpha.c:24 in alpha_init via macro Rte_Call_Beta_Op" modelElement="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355"/>
+					<tag xmi:id="EAID_E139A398_DFF1_59C5_9019_CD0E3FAF07C5" name="via_macros" value="Rte_Call_Beta_Op" modelElement="EAID_45BA0EB3_2F43_50C2_88BC_2E8682DEA355"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_8106775E_FC08_5DA5_B792_CB287D6F85E7">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_A0B9968A_CB55_5604_A59E_1DAAE0C2772F"><model type="Interface" name="beta_api_cb"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="fn_address"/>
+				<documentation value="src/App/alpha.c:23 in alpha_init"/>
+				<tags>
+					<tag xmi:id="EAID_5839D704_06C0_5B95_9150_BF4CA7C421EA" name="evidence_count" value="1" modelElement="EAID_8106775E_FC08_5DA5_B792_CB287D6F85E7"/>
+					<tag xmi:id="EAID_58AFA907_BA29_5D57_92F6_D3AA4FA636FA" name="first_evidence" value="src/App/alpha.c:23 in alpha_init" modelElement="EAID_8106775E_FC08_5DA5_B792_CB287D6F85E7"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_7D4D399B_A150_5A84_8AA3_33C80523EE79">
+				<source xmi:idref="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"><model type="Component" name="beta"/></source>
+				<target xmi:idref="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614"><model type="Interface" name="alpha_internal"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="call"/>
+				<documentation value="src/App/beta.c:14 in beta_api"/>
+				<tags>
+					<tag xmi:id="EAID_25A3768C_6403_5A7C_ACC8_857EC2FA1474" name="evidence_count" value="1" modelElement="EAID_7D4D399B_A150_5A84_8AA3_33C80523EE79"/>
+					<tag xmi:id="EAID_70B36918_9A08_58E7_A9AD_A6622C8E99FB" name="first_evidence" value="src/App/beta.c:14 in beta_api" modelElement="EAID_7D4D399B_A150_5A84_8AA3_33C80523EE79"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_6F484FE0_B718_5498_938E_F09D5960DD56">
+				<source xmi:idref="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"><model type="Component" name="beta"/></source>
+				<target xmi:idref="EAID_E96D0C37_2558_5303_A584_524565E071B0"><model type="Interface" name="alpha_counter"/></target>
+				<properties ea_type="Usage" direction="Source -&gt; Destination" stereotype="global_write"/>
+				<documentation value="src/App/beta.c:13 in beta_api"/>
+				<tags>
+					<tag xmi:id="EAID_4E35A44F_9822_5C2E_91F1_163D883A8A0B" name="evidence_count" value="1" modelElement="EAID_6F484FE0_B718_5498_938E_F09D5960DD56"/>
+					<tag xmi:id="EAID_90EB2A9E_4B84_5656_B445_2965AE08152C" name="first_evidence" value="src/App/beta.c:13 in beta_api" modelElement="EAID_6F484FE0_B718_5498_938E_F09D5960DD56"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_FBD3B1BE_8A4F_5CE0_A17F_7D921333874D">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24"><model type="Component" name="ext.h"/></target>
+				<properties ea_type="Dependency" direction="Source -&gt; Destination" stereotype="as-built"/>
+				<documentation value="global_read ext_value (1 uses)&#xA;include src/lib/ext.h (1 uses)"/>
+				<tags>
+					<tag xmi:id="EAID_6BF141E5_8E13_519E_81A2_85CE213799B9" name="evidence_count" value="2" modelElement="EAID_FBD3B1BE_8A4F_5CE0_A17F_7D921333874D"/>
+					<tag xmi:id="EAID_0B209D4F_2BD9_55B0_8DF8_E0C6F35B669C" name="kinds" value="global_read=1; include=1" modelElement="EAID_FBD3B1BE_8A4F_5CE0_A17F_7D921333874D"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_5B61AD26_F5C8_585E_A274_72EE6F778613">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A"><model type="Component" name="rte_like.h"/></target>
+				<properties ea_type="Dependency" direction="Source -&gt; Destination" stereotype="as-built"/>
+				<documentation value="include src/lib/rte_like.h (1 uses)&#xA;macro_use Rte_Call_Beta_Op (1 uses)"/>
+				<tags>
+					<tag xmi:id="EAID_2F23D78B_EA0F_5A82_85A6_CF715A39717D" name="evidence_count" value="2" modelElement="EAID_5B61AD26_F5C8_585E_A274_72EE6F778613"/>
+					<tag xmi:id="EAID_AAEB0B34_760F_5156_B6B5_6C7F2D1BC95E" name="kinds" value="include=1; macro_use=1" modelElement="EAID_5B61AD26_F5C8_585E_A274_72EE6F778613"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_A33D4DB1_005A_55A9_A3AE_ADC065EB5334">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073"><model type="Component" name="gamma_helper.h"/></target>
+				<properties ea_type="Dependency" direction="Source -&gt; Destination" stereotype="as-built"/>
+				<documentation value="include src/App/gamma_helper.h (1 uses)&#xA;macro_use GAMMA_MAX (1 uses)"/>
+				<tags>
+					<tag xmi:id="EAID_FBE07EF9_6CD2_5E9D_BE71_DA442280AF95" name="evidence_count" value="2" modelElement="EAID_A33D4DB1_005A_55A9_A3AE_ADC065EB5334"/>
+					<tag xmi:id="EAID_FEB6091F_E822_5330_ABBF_065E01F19A08" name="kinds" value="include=1; macro_use=1" modelElement="EAID_A33D4DB1_005A_55A9_A3AE_ADC065EB5334"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_49A796C6_B09D_5274_ABD9_4085B1716F36">
+				<source xmi:idref="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"><model type="Component" name="beta"/></source>
+				<target xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></target>
+				<properties ea_type="Dependency" direction="Source -&gt; Destination" stereotype="as-built"/>
+				<documentation value="call alpha_internal (1 uses)&#xA;global_write alpha_counter (1 uses)&#xA;include src/App/alpha.h (1 uses)"/>
+				<tags>
+					<tag xmi:id="EAID_28BBAEE8_0478_59BE_AFB2_BD93ADF66E12" name="evidence_count" value="3" modelElement="EAID_49A796C6_B09D_5274_ABD9_4085B1716F36"/>
+					<tag xmi:id="EAID_2DD6D0C1_A1B4_58E1_AC2D_E3E35805E3E8" name="kinds" value="call=1; global_write=1; include=1" modelElement="EAID_49A796C6_B09D_5274_ABD9_4085B1716F36"/>
+				</tags>
+			</connector>
+			<connector xmi:idref="EAID_A3E8A110_9F67_5BA6_8AF0_FD1A767EED92">
+				<source xmi:idref="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B"><model type="Component" name="alpha"/></source>
+				<target xmi:idref="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76"><model type="Component" name="beta"/></target>
+				<properties ea_type="Dependency" direction="Source -&gt; Destination" stereotype="as-built"/>
+				<documentation value="call beta_api (1 uses)&#xA;call beta_hidden (1 uses)&#xA;call beta_rte_op (1 uses)&#xA;fn_address beta_api_cb (1 uses)&#xA;include src/App/beta.h (1 uses)"/>
+				<tags>
+					<tag xmi:id="EAID_FCE994C1_7EC8_5703_94E8_04137B81925E" name="evidence_count" value="5" modelElement="EAID_A3E8A110_9F67_5BA6_8AF0_FD1A767EED92"/>
+					<tag xmi:id="EAID_5E8EB5BF_729A_5D81_A46E_C2E678774FF8" name="kinds" value="call=3; fn_address=1; include=1" modelElement="EAID_A3E8A110_9F67_5BA6_8AF0_FD1A767EED92"/>
+				</tags>
+			</connector>
+		</connectors>
+		<diagrams>
+			<diagram xmi:id="EAID_2DED41A6_D805_55EA_A53E_C8039E3AA286">
+				<model package="EAPK_8374DAE5_A25C_5989_B336_1299C14230EE" owner="EAPK_8374DAE5_A25C_5989_B336_1299C14230EE"/>
+				<properties name="alpha (as-built)" type="Component"/>
+				<elements>
+					<element geometry="Left=320;Top=40;Right=540;Bottom=100;" subject="EAID_627AF7B2_027C_524D_B900_4ED392F7EC6F" seqno="1"/>
+					<element geometry="Left=320;Top=130;Right=540;Bottom=190;" subject="EAID_95B6EF7D_3CD3_546A_BC20_92ED74709614" seqno="2"/>
+					<element geometry="Left=320;Top=220;Right=540;Bottom=280;" subject="EAID_F047C72F_9085_5358_ACA2_C3F7ACF88813" seqno="3"/>
+					<element geometry="Left=320;Top=310;Right=540;Bottom=370;" subject="EAID_63BA61B2_B7C7_52E3_A7E1_5D4670DDC1EF" seqno="4"/>
+					<element geometry="Left=320;Top=400;Right=540;Bottom=460;" subject="EAID_E96D0C37_2558_5303_A584_524565E071B0" seqno="5"/>
+					<element geometry="Left=600;Top=40;Right=820;Bottom=100;" subject="EAID_80E7FB00_4A0F_5589_B10E_0CFEFD18767B" seqno="6"/>
+					<element geometry="Left=880;Top=40;Right=1100;Bottom=100;" subject="EAID_C5938A17_39EF_561F_8BD7_71CE3564CD24" seqno="7"/>
+					<element geometry="Left=880;Top=130;Right=1100;Bottom=190;" subject="EAID_F68BD685_B19B_5771_AFEC_1BCB06EE763A" seqno="8"/>
+					<element geometry="Left=880;Top=220;Right=1100;Bottom=280;" subject="EAID_E1C6E74E_2BBD_5649_82E0_92C33AD78073" seqno="9"/>
+					<element geometry="Left=880;Top=310;Right=1100;Bottom=370;" subject="EAID_9B015A9E_6C47_50D8_B966_AE67E2823B76" seqno="10"/>
+				</elements>
+			</diagram>
+		</diagrams>
+	</xmi:Extension>
+</xmi:XMI>
