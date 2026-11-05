@@ -53,3 +53,20 @@ before and after). Do not start EA by hand while it runs.
   the result is identical to the first import. In the GUI expect that dialog.
 - EA start: with the enterprise network up it answered within 13 s on the last run; earlier starts showed a
   *Licence Management* dialog and took up to 6 minutes (use `--wait 900`).
+
+## Probe for ea-apply (increment 0, prepared 2026-11-05)
+
+`tools/ea_probe.py` proves on EA 16 what `ea-apply` will rely on before it is built (plan
+`docs/plans/2026-11-05-ea-apply.md`). Same limits as above: only a scratch copy of `EABase.qea` in its own run folder.
+
+1. Close Enterprise Architect (the probe refuses to run while EA is open). Enterprise network / VPN up.
+2. `.venv\Scripts\python tools\ea_probe.py --go` (`--timeout 900` is the default: the licence check can take minutes).
+3. Send `report.txt` from the run folder (`%TEMP%\archcreator_ea_verify\probe_<time>`).
+
+| Step | Question |
+|---|---|
+| P0 / E0 | EA is closed / installed |
+| E1, E2 | COM starts, the scratch copy opens |
+| X1 | command line of the EA that COM started (does it carry `-Embedding`? ea-apply ends only such a process on timeout) |
+| C1..C11 | package, package tag (through `Package.Element`), Component with stereotype, notes and a 300-character tag, Interface with operation / attribute, connectors `Realisation`, `Realization`, `Usage`, `Dependency` with stereotypes and tags, a diagram with two objects, lookup by GUID and by id, update of name, notes and stereotype |
+| S1..S9 | what the `.qea` really holds afterwards: types, stereotypes, ends, tags (S4: how a long tag is stored), operations, attributes, diagram geometry |
