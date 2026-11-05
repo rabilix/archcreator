@@ -317,6 +317,13 @@ with the evidence in their notes, and a component diagram. Import: open a
 File*. Different modules never share an element. The design packages are
 never written to.
 
+archcreator writes an Enterprise Architect model only through EA's Automation
+Interface (`ea-apply`, in development), only
+into a copy it made itself or you named, never into a protected model (the
+profile's design model, `--design`, the model it copies from, any EA model in the
+repository), and never deletes anything. `analyze`, `scan`, `export-xmi` and the
+design comparison never write a model.
+
 Checked against EA 16.0 (build 1605): every element, connector, stereotype, tagged
 value and diagram object arrives, with the GUIDs of the file. Importing a module
 whose package already exists makes EA open its *Import Package from Native/XMI

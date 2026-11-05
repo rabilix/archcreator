@@ -117,7 +117,12 @@ Import in EA 16: select the target package (a scratch package or a copy of the
 model, never the design packages), *Publish > Import > XMI File*. IDs are EA
 style UUIDv5, so importing the same module again replaces the earlier as-built
 package. Types and signatures are not exported: archcreator does not record them.
-archcreator never writes `.qea`/`.eap` files.
+archcreator writes an Enterprise Architect model only through EA's Automation
+Interface (`ea-apply`, in development: `docs/plans/2026-11-05-ea-apply.md`), only
+into a copy it made itself or you named, never into a protected model (the
+profile's design model, `--design`, the model it copies from, any EA model in the
+repository), and never deletes anything. `analyze`, `scan`, `export-xmi` and the
+design comparison never write a model.
 
 ### Front ends
 
